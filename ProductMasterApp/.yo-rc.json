@@ -1,0 +1,21 @@
+{
+  "generator-jhipster": {
+    "jhipsterVersion": "3.0.0",
+    "baseName": "ProductMasterApp",
+    "packageName": "com.aspire.productmaster",
+    "packageFolder": "com/aspire/productmaster",
+    "serverPort": "8080",
+    "authenticationType": "jwt",
+    "hibernateCache": "no",
+    "clusteredHttpSession": "no",
+    "websocket": "no",
+    "databaseType": "mongodb",
+    "devDatabaseType": "mongodb",
+    "prodDatabaseType": "mongodb",
+    "searchEngine": "no",
+    "buildTool": "gradle",
+    "enableSocialSignIn": false,
+    "jwtSecretKey": "e857c6ae35ec6f93595a779c8d2c94eb854ce233",
+    "enableTranslation": false
+  }
+}
