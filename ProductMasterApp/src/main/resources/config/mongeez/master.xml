@@ -2,4 +2,5 @@
     <file path="authorities.xml"/>
     <file path="users.xml"/>
     <file path="social_user_connections.xml"/>
+	<file path="product_master_indexes.xml"/>
 </changeFiles>

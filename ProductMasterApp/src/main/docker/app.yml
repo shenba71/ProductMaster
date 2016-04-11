@@ -5,7 +5,7 @@ services:
         external_links:
             - productmasterapp-mongodb:mongodb
         environment:
-            - SPRING_PROFILES_ACTIVE=prod
+            - SPRING_PROFILES_ACTIVE=dev
             - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017
             - SPRING_DATA_MONGODB_DATABASE=ProductMasterApp
         ports:

@@ -65,6 +65,11 @@ task testReport(type: TestReport) {
     reportOn cucumberTest
 }
 
+group = 'com.aspire.productmaster'
+version = '0.0.1-SNAPSHOT'
+description = ''
+
+
 cucumberTest.finalizedBy(testReport)
 
 apply from: 'gradle/sonar.gradle'
@@ -80,10 +85,6 @@ if (project.hasProperty('prod')) {
     apply from: 'gradle/profile_dev.gradle'
 }
 
-group = 'com.aspire.productmaster'
-version = '0.0.1-SNAPSHOT'
-
-description = ''
 
 configurations {
     providedRuntime

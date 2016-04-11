@@ -1,20 +1,36 @@
-apply plugin: 'docker'
+// Local variables
+def dockerfile_src_path = 'src' + File.separator + 'main' + File.separator + 'docker'
+def dockerfile_dest_path = 'build' + File.separator + 'docker'
+def tag = 'productmasterapp'
+def tagVersion = 'latest'
 
-task buildDocker(type: Docker, dependsOn: build) {
-    push = false
-    tag = 'productmasterapp'
-    tagVersion = 'latest'
-    dockerfile = file('src/main/docker/Dockerfile')
-    doFirst {
-        copy {
-            from "src/main/docker/"
-            into stageDir
-            include "*.*"
-        }
-        copy {
-            from "build/libs"
-            into stageDir
-            include "*.war*"
-        }
-    }
+// Docker configurations
+task copyDockerDependencyFiles(dependsOn: build){
+	doFirst {
+		copy {
+		  from war
+		  into dockerfile_dest_path
+		}
+		copy {
+		  from dockerfile_src_path
+		  into dockerfile_dest_path
+		  //exclude '**/*.yml'
+		}
+	}
+}
+
+// Tag name needs to be provided dynamically once the name is certified
+task buildDockerImage (type: Exec) {
+		dependsOn copyDockerDependencyFiles
+		commandLine "docker", "build", "-t", "${tag}:${tagVersion}", "--build-arg", "BUILD_VERSION=${project.version}", dockerfile_dest_path
+}
+
+task startContainer (type: Exec) {
+		dependsOn buildDockerImage
+		//commandLine "docker", "run", "-p", "8080:8080", "-t", "${tag}:${tagVersion}"
+		commandLine "docker-compose", "-f", "${dockerfile_dest_path}"+ File.separator +"app.yml", "up"
+}
+
+task stopContainer (type: Exec) {
+	commandLine "docker-compose", "-f", "${dockerfile_dest_path}"+ File.separator +"app.yml", "stop"
 }

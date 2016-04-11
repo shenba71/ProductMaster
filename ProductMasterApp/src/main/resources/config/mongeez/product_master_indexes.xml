@@ -1,0 +1,7 @@
+<mongoChangeLog>
+    <changeSet changeId="ChangeSet-4" author="jhipster">
+        <script>
+            db.ProductMaster.ensureIndex({"Product style" : 1, "Product size" : 1, "Product color": 1}, { unique: true });
+        </script>
+    </changeSet>
+</mongoChangeLog>

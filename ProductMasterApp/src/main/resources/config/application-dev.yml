@@ -19,12 +19,12 @@ spring:
             enabled: false # we use gulp + BrowserSync for livereload
     data:
         mongodb:
-            uri: mongodb://localhost:27017
+            uri: mongodb://192.168.99.100:27017
             database: ProductMasterApp
-            host: localhost
+            host: 192.168.99.100
             port: 27017
     mail:
-        host: localhost
+        host: 192.168.99.100
     messages:
         cache-seconds: 1
     thymeleaf:
@@ -42,16 +42,16 @@ server:
 
 jhipster:
     mail: # specific JHipster mail property, for standard properties see MailProperties
-        from: ProductMasterApp@localhost
+        from: ProductMasterApp@192.168.99.100
     metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
         jmx.enabled: true
         spark:
             enabled: false
-            host: localhost
+            host: 192.168.99.100
             port: 9999
         graphite:
             enabled: false
-            host: localhost
+            host: 192.168.99.100
             port: 2003
             prefix: ProductMasterApp
         logs: # report metrics in the logs
@@ -60,6 +60,6 @@ jhipster:
     logging:
         logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
             enabled: false
-            host: localhost
+            host: 192.168.99.100
             port: 5000
             queueSize: 512
