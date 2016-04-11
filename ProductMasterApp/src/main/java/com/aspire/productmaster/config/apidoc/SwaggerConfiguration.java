@@ -34,6 +34,8 @@ public class SwaggerConfiguration {
     private final Logger log = LoggerFactory.getLogger(SwaggerConfiguration.class);
 
     public static final String DEFAULT_INCLUDE_PATTERN = "/api/.*";
+    
+    public static final String PRODUCT_INCLUDE_PATTERN = "/product/.*";
 
     /**
      * Swagger Springfox configuration.
@@ -71,6 +73,7 @@ public class SwaggerConfiguration {
             .directModelSubstitute(java.time.LocalDateTime.class, Date.class)
             .select()
             .paths(regex(DEFAULT_INCLUDE_PATTERN))
+            .paths(regex(PRODUCT_INCLUDE_PATTERN))
             .build();
         watch.stop();
         log.debug("Started Swagger in {} ms", watch.getTotalTimeMillis());
