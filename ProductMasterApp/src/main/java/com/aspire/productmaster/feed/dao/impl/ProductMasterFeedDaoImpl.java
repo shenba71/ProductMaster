@@ -105,6 +105,9 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
 		if (CollectionUtils.isEmpty(searchResults) == false) {
 			results = searchResults.toString();
 		}
+		else{
+			results = "No Records Found";
+		}
 		return results;
 	}
 

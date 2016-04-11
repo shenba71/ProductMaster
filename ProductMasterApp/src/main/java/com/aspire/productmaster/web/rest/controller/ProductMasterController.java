@@ -43,7 +43,7 @@ public class ProductMasterController {
 		log.debug("Controller for search...");
 		String searchResult = productMasterSearchservice.searchProductDetails(styleNumber, color, size);
 		log.debug("Response===" + searchResult);
-		if (searchResult.isEmpty()) {
+		if (searchResult == null && searchResult.isEmpty()) {
 			response = "Style Not Found";
 		} else {
 			response = searchResult;
