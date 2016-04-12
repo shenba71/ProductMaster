@@ -19,9 +19,9 @@ spring:
             enabled: false # we use gulp + BrowserSync for livereload
     data:
         mongodb:
-            uri: mongodb://192.168.99.100:27017
+            uri: mongodb://localhost:27017
             database: ProductMasterApp
-            host: 192.168.99.100
+            host: localhost
             port: 27017
     mail:
         host: localhost

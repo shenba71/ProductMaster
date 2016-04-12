@@ -133,3 +133,4 @@ Desktop.ini
 .eslintcache
 /build
 /bin
+/.apt_generated/
