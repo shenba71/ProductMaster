@@ -2,8 +2,8 @@
   "generator-jhipster": {
     "jhipsterVersion": "3.0.0",
     "baseName": "ProductMasterApp",
-    "packageName": "com.aspire.productmaster",
-    "packageFolder": "com/aspire/productmaster",
+    "packageName": "com.schawk.productmaster",
+    "packageFolder": "com/schawk/productmaster",
     "serverPort": "8080",
     "authenticationType": "jwt",
     "hibernateCache": "no",

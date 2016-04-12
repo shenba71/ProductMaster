@@ -26,7 +26,7 @@ apply plugin: 'propdeps'
 defaultTasks 'bootRun'
 
 bootRepackage {
-   mainClass = 'com.aspire.productmaster.ProductMasterApp'
+   mainClass = 'com.schawk.productmaster.ProductMasterApp'
 }
 
 war {
@@ -34,7 +34,7 @@ war {
 }
 
 springBoot {
-    mainClass = 'com.aspire.productmaster.ProductMasterApp'
+    mainClass = 'com.schawk.productmaster.ProductMasterApp'
     executable = true
 }
 
@@ -65,7 +65,7 @@ task testReport(type: TestReport) {
     reportOn cucumberTest
 }
 
-group = 'com.aspire.productmaster'
+group = 'com.schawk.productmaster'
 version = '0.0.1-SNAPSHOT'
 description = ''
 

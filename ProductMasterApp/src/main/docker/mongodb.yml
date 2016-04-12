@@ -3,7 +3,7 @@ services:
     productmasterapp-mongodb:
         container_name: productmasterapp-mongodb
         image: mongo:3.2.3
-        # volumes:
-        #     - ~/volumes/jhipster/ProductMasterApp/mongodb/:/data/db/
+        volumes:
+            - /volumes/jhipster/ProductMasterApp/mongodb/:/data/db/
         ports:
             - 27017:27017

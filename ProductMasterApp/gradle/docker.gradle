@@ -28,9 +28,9 @@ task buildDockerImage (type: Exec) {
 task startContainer (type: Exec) {
 		dependsOn buildDockerImage
 		//commandLine "docker", "run", "-p", "8080:8080", "-t", "${tag}:${tagVersion}"
-		commandLine "docker-compose", "-f", "${dockerfile_dest_path}"+ File.separator +"app.yml", "up"
+		commandLine "docker-compose", "-f", "${dockerfile_dest_path}"+ File.separator +"docker-compose.yml", "up"
 }
 
 task stopContainer (type: Exec) {
-	commandLine "docker-compose", "-f", "${dockerfile_dest_path}"+ File.separator +"app.yml", "stop"
+	commandLine "docker-compose", "-f", "${dockerfile_dest_path}"+ File.separator +"docker-compose.yml", "stop"
 }
