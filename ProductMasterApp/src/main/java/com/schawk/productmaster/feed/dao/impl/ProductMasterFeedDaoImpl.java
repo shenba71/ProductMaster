@@ -247,7 +247,7 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
     public String findProductByFields(String columnName, String[] columnValues,
             String[] columnsToInclude) throws Exception {
         LOG.info("Search for multiple style numbers and display specified columns");
-        String results = null;
+        String results = "";
         Query query = new Query();
         query.addCriteria(Criteria.where(columnName).in(columnValues));
 
@@ -262,8 +262,6 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
 
         if (CollectionUtils.isEmpty(searchResults) == false) {
             results = searchResults.toString();
-        } else {
-            results = "No Records Found.";
         }
         return results;
     }
@@ -272,7 +270,7 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
     public String findProductByStyleAndColor(String styleNumber, String colorNumber)
             throws Exception {
         LOG.info("Search for style numbers and color");
-        String results = null;
+        String results = "";
         Query query = new Query();
         query.addCriteria(
                 Criteria.where(PRODUCT_STYLE).is(styleNumber).and(PRODUCT_COLOR).is(colorNumber));
@@ -289,8 +287,6 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         String searchResult = mongoTemplate.findOne(query, String.class, COLLECTION_NAME);
         if (StringUtils.isEmpty(searchResult) == false) {
             results = searchResult.toString();
-        } else {
-            results = "NO RECORDS FOUND FOR GIVEN STYLE AND COLOR";
         }
         return results;
     }
@@ -298,7 +294,7 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
     @Override
     public String findProductByStyle(String styleNumber, String[] field) throws Exception {
         LOG.info("Search for style numbers");
-        String results = null;
+        String results = "";
         Query query = new Query();
         query.addCriteria(Criteria.where(PRODUCT_STYLE).is(styleNumber));
 
@@ -313,8 +309,6 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         String searchResult = mongoTemplate.findOne(query, String.class, COLLECTION_NAME);
         if (StringUtils.isEmpty(searchResult) == false) {
             results = searchResult.toString();
-        } else {
-            results = "NO RECORDS FOUND FOR GIVEN STYLE";
         }
         return results;
     }
@@ -364,7 +358,7 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
     public String findProductByStyleColorAndSize(String styleNumber, String colorCode,
             String sizeCode) throws Exception {
         LOG.info("Search for size by given style numbers, color and sizeCode");
-        String results = null;
+        String results = "";
         String searchResult = null;
 
         List<AggregationOperation> list = new ArrayList<AggregationOperation>();
@@ -391,8 +385,6 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         LOG.debug("searchResult : " + searchResult);
         if (StringUtils.isEmpty(searchResult) == false) {
             results = searchResult;
-        } else {
-            results = "No Product record found for given style, color and size";
         }
         return results;
     }
@@ -401,7 +393,7 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
     public String findProductSizesByStyleAndColor(String styleNumber, String colorCode)
             throws Exception {
         LOG.info("Search for all sizes of product using style numbers and color");
-        String results = null;
+        String results = "";
         String searchResult = null;
         List<AggregationOperation> list = new ArrayList<AggregationOperation>();
         // Deconstructs an array field from the input documents to output a
@@ -424,8 +416,6 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         LOG.debug("searchResult : " + searchResult);
         if (StringUtils.isEmpty(searchResult) == false) {
             results = searchResult.toString();
-        } else {
-            results = "No Product record found for given style, color and size";
         }
         return results;
     }
