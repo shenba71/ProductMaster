@@ -6,9 +6,6 @@ public interface ProductMasterFeedDao {
 
 	public String saveInputFeed(JSONArray jsonArray) throws Exception;
 
-	public String searchSizeRecord(String styleNumber, String colorCode,
-			String sizeCode) throws Exception;
-
 	/**
 	 * @param productMetaData
 	 * @return the inserted record as response

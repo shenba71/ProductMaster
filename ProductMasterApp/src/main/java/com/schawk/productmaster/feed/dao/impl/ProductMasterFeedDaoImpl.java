@@ -239,25 +239,6 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
 
 	}
 
-	public String searchSizeRecord(String styleNumber, String colorCode,
-			String sizeCode) throws Exception {
-		Query query = new Query();
-		String results = null;
-		query.addCriteria(Criteria.where(PRODUCT_STYLE).is(styleNumber)
-				.and(PRODUCT_COLOR).is(colorCode));
-		query.addCriteria(Criteria.where(PRODUCT_SIZE).is(sizeCode));
-		String searchResults = mongoTemplate.findOne(query, String.class,
-				COLLECTION_NAME);
-		if (searchResults != null && searchResults.isEmpty() == false) {
-			results = searchResults.toString();
-
-		} else {
-			results = "NO SIZE RECORDS";
-		}
-
-		return results;
-	}
-
 	@Override
 	public String updateSizeMetaData(String sizeMetaData, String styleNumber,
 			String colorNumber, String sizeCode) throws Exception {
