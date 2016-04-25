@@ -212,8 +212,9 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
 		BasicDBObject object = new BasicDBObject();
 		object.append("$addToSet", sizeObject);
 		// If a size record was not present, then allow to insert
-		if (searchSizeRecord(styleNumber, colorNumber, sizeCode)
-				.equalsIgnoreCase("NO SIZE RECORDS")) {
+		if (("No Product record found for given style, color and size")
+				.equalsIgnoreCase(findProductByStyleColorAndSizes(styleNumber,
+						colorNumber, sizeCode))) {
 			collection.update(queryObject, object, true, false);
 			response = findProductByStyle(styleNumber, null);
 			;
