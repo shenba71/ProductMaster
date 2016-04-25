@@ -161,7 +161,7 @@ public class ProductMasterStagingServiceImpl implements ProductMasterStagingServ
         String response = null;
         String updatedSizeDatas = null;
         if (("No Product record found for given style, color and size")
-                .equalsIgnoreCase(productMasterFeedDao.findProductByStyleColorAndSizes(styleNumber,
+                .equalsIgnoreCase(productMasterFeedDao.findProductByStyleColorAndSize(styleNumber,
                         colorNumber, sizeCode))) {
             valueMap.put("sizeCode", sizeCode);
             updatedSizeDatas = convertMapToJson(valueMap);
