@@ -413,8 +413,7 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         list.add(Aggregation.match(Criteria.where(PRODUCT_COLOR).is(colorCode)));
         list.add(Aggregation.group("_id", "styleNumber").push("colors").as("colors"));
         // Passes the documents with only the specified fields
-        list.add(Aggregation.project("_id", "styleNumber", "colors.color.colorCode",
-                "colors.color.sizes"));
+        list.add(Aggregation.project("_id", "styleNumber", "colors"));
         Aggregation aggregate = Aggregation.newAggregation(list);
         List<String> searchResults = mongoTemplate
                 .aggregate(aggregate, COLLECTION_NAME, String.class).getMappedResults();
