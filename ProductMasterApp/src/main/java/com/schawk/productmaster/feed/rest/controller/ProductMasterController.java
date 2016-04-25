@@ -25,7 +25,7 @@ import io.swagger.annotations.ApiOperation;
 /**
  * @author shenbagaganesh.param
  * 
- *         Controller class for API endpoints of ProductMetaData MicroService
+ *Controller class for API endpoints of ProductMetaData MicroService
  *
  */
 @RestController
@@ -292,18 +292,20 @@ public class ProductMasterController {
 
     /**
      * Search the product details of the given styleNumber and fields that
-     * should be included in the query results. Example Input :
-     * /styles/12345?include=styleNumber,productName,colors Example Input :
-     * /styles/12345
+     * should be included in the query results. 
+     * Example Input :/styles/12345?include=styleNumber,productName,colors 
+     * Example Input :/styles/12345
      * 
      * @param styleNumber
      * @param fieldsToDisplay
      * @return
+     * @throws Exception 
      */
     @RequestMapping(value = "/styles/{styleNumber}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("search and retrieves specified fields for given style number")
     public String findProductByStyle(@PathVariable("styleNumber") String styleNumber,
-            @RequestParam(value = "include", required = false) String fieldsToDisplay) {
+            @RequestParam(value = "include", required = false) String fieldsToDisplay)
+                    throws Exception {
         LOG.info("StyleNumber : " + styleNumber + " Fields to include : " + fieldsToDisplay);
 
         String[] fieldsToInclude = null;
@@ -319,7 +321,6 @@ public class ProductMasterController {
      * /styles?q={styleNumber=12345,12346}&include=styleNumber,colors b) Global
      * search for specified fields which are mentioned in text indexes Example
      * Input : /styles?q=FOOTWEAR
-     * 
      * @param globalSearchFields
      * @param fieldsToInclude
      * @return
@@ -332,21 +333,29 @@ public class ProductMasterController {
             @RequestParam(value = "include", required = false) String fieldsToInclude)
                     throws Exception {
         String response = null;
-        LOG.info(
-                "Query field : " + globalSearchFields + " Fields to include : " + fieldsToInclude);
+
+        LOG.info("Query field : " + globalSearchFields + " Fields to include : " + fieldsToInclude);
         if (StringUtils.isNotBlank(globalSearchFields)) {
             if (globalSearchFields.startsWith("{")) {
                 globalSearchFields = globalSearchFields.replaceAll("(\\{|\\})", "");
                 String[] searchFields = globalSearchFields.split("=");
 
-                String columnName = searchFields[0];
+                //check if array size is two since the input would be q={styleNumber=12345,12346}
+                String columnName = null;
+                String columnValue = null;
+                if (searchFields.length == 2) {
+                    columnName = searchFields[0];
+                    columnValue = searchFields[1];
+                }
 
+                LOG.debug("Global search for field : " + columnName + " and value :" + columnValue);
                 String[] columnValues = null;
-                if (StringUtils.isNotBlank(searchFields[1])) {
-                    columnValues = searchFields[1].split(",");
+                if (StringUtils.isNotBlank(columnValue)) {
+                    columnValues = columnValue.split(",");
                 }
 
                 String[] columnsToInclude = null;
+                // check if include fields are present
                 if (StringUtils.isNotBlank(fieldsToInclude)) {
                     columnsToInclude = fieldsToInclude.split(",");
                 }
@@ -364,50 +373,51 @@ public class ProductMasterController {
     }
 
     /**
-     * Search the product with the specified color Example Input :
-     * /styles/12345/colors/000
-     * 
+     * Search the product with the specified color 
+     * Example Input :/styles/12345/colors/000
      * @param styleNumber
      * @param colorCode
      * @return
+     * @throws Exception 
      */
     @RequestMapping(value = "/styles/{styleNumber}/colors/{colorCode}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("search and retrieves the record matched for given style number and color")
     public String findProductByStyleAndColor(@PathVariable("styleNumber") String styleNumber,
-            @PathVariable("colorCode") String colorCode) {
+            @PathVariable("colorCode") String colorCode) throws Exception {
         LOG.info("StyleNumber : " + styleNumber + " colorCode : " + colorCode);
         return productMasterSearchservice.findProductByStyleAndColor(styleNumber, colorCode);
     }
 
     /**
-     * Search the product size with the specified size Example Input :
-     * /styles/831070/colors/501/sizes/M
-     * 
+     * Search the product size with the specified size 
+     * Example Input :/styles/831070/colors/501/sizes/M
      * @param styleNumber
      * @param colorCode
      * @return
+     * @throws Exception 
      */
-    @RequestMapping(value = "/styles/{styleNumber}/colors/{colorCode}/sizes/{size}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/styles/{styleNumber}/colors/{colorCode}/sizes/{sizeCode}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public String findProductByStyleColorAndSize(@PathVariable("styleNumber") String styleNumber,
-            @PathVariable("colorCode") String colorCode, @PathVariable("size") String size) {
-        LOG.info("StyleNumber : " + styleNumber + " colorCode : " + colorCode + " Size : " + size);
-        return productMasterSearchservice.findProductByStyleColorAndSizes(styleNumber, colorCode,
-                size);
+            @PathVariable("colorCode") String colorCode, @PathVariable("sizeCode") String sizeCode)
+                    throws Exception {
+        LOG.info("StyleNumber : " + styleNumber + " colorCode : " + colorCode + " Size : "
+                + sizeCode);
+        return productMasterSearchservice.findProductByStyleColorAndSize(styleNumber, colorCode,
+                sizeCode);
     }
 
     /**
-     * Search all product sizes based on style and color Example Input
-     * :/styles/12345/colors/000/sizes
-     * 
+     * Search all product sizes based on style and color 
+     * Example Input : /styles/12345/colors/000/sizes
      * @param styleNumber
      * @param colorCode
      * @return
+     * @throws Exception 
      */
     @RequestMapping(value = "/styles/{styleNumber}/colors/{colorCode}/sizes", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String findProductByStyleColorAndSizes(@PathVariable("styleNumber") String styleNumber,
-            @PathVariable("colorCode") String colorCode) {
+    public String findProductSizesByStyleAndColor(@PathVariable("styleNumber") String styleNumber,
+            @PathVariable("colorCode") String colorCode) throws Exception {
         LOG.info("StyleNumber : " + styleNumber + " colorCode : " + colorCode);
-        return productMasterSearchservice.findProductByStyleColorAndSizes(styleNumber, colorCode);
+        return productMasterSearchservice.findProductSizesByStyleAndColor(styleNumber, colorCode);
     }
-
 }
