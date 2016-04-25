@@ -41,7 +41,7 @@ import com.schawk.productmaster.web.rest.errors.CustomMongoException;
 public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
 
 	@Autowired
-	MongoTemplate mongoTemplate;
+	private MongoTemplate mongoTemplate;
 
 	private static final Logger LOG = LoggerFactory
 			.getLogger(ProductMasterFeedDaoImpl.class);
@@ -116,15 +116,6 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
 		return response;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.schawk.productmaster.feed.dao.ProductMasterFeedDao#saveProductMetaData
-	 * (java.lang.String)
-	 * 
-	 * recieves the input metadata for style and inserts in to Mongo
-	 */
 	@Override
 	public String saveProductMetaDataStyle(String productMetaData)
 			throws Exception {
@@ -148,15 +139,6 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.schawk.productmaster.feed.dao.ProductMasterFeedDao#
-	 * updateProductMetaDataStyle(java.lang.String)
-	 * 
-	 * update the style with given parameters and returns the updated document
-	 * as response
-	 */
 	@Override
 	public String updateProductMetaDataStyle(String productMetaData)
 			throws Exception {
@@ -172,15 +154,6 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.schawk.productmaster.feed.dao.ProductMasterFeedDao#saveColorMetaData
-	 * (java.lang.String, java.lang.String)
-	 * 
-	 * recieves input colormetadata json and inserts into mongodb
-	 */
 	@Override
 	public String saveColorMetaData(String colorMetaData, String styleNumber)
 			throws Exception {
@@ -200,8 +173,9 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
 		objectToInsert.append("$addToSet", colorObject).append("$setOnInsert",
 				styleObject);
 		// insertion will happen only if record not present for given color
-		if (findProductByStyleAndColor(styleNumber, colorNumber)
-				.equalsIgnoreCase("NO RECORDS FOUND FOR GIVEN STYLE AND COLOR")) {
+		if (("NO RECORDS FOUND FOR GIVEN STYLE AND COLOR")
+				.equalsIgnoreCase(findProductByStyleAndColor(styleNumber,
+						colorNumber))) {
 			collection.update(styleObject, objectToInsert, true, false);
 			response = findProductByStyle(styleNumber, null);
 		} else {
@@ -210,15 +184,6 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
 		return response;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.schawk.productmaster.feed.dao.ProductMasterFeedDao#saveSizeMetaData
-	 * (java.lang.String, java.lang.String, java.lang.String)
-	 * 
-	 * recieves size metadata as json and inserts into mongodb
-	 */
 	@Override
 	public String saveSizeMetaData(String sizeMetaData, String styleNumber,
 			String colorNumber) throws Exception {
@@ -235,11 +200,11 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
 				sizeMetaDataObject);
 		// If style and color record was not already present, then wil create
 		// style and color record before inserting size metadata
-		if (findProductByStyle(styleNumber, null).equalsIgnoreCase(
-				"NO RECORDS FOUND FOR GIVEN STYLE")
-				|| findProductByStyleAndColor(styleNumber, colorNumber)
-						.equalsIgnoreCase(
-								"NO RECORDS FOUND FOR GIVEN STYLE AND COLOR")) {
+		if (("NO RECORDS FOUND FOR GIVEN STYLE")
+				.equalsIgnoreCase(findProductByStyle(styleNumber, null))
+				|| ("NO RECORDS FOUND FOR GIVEN STYLE AND COLOR")
+						.equalsIgnoreCase(findProductByStyleAndColor(
+								styleNumber, colorNumber))) {
 			BasicDBObject colorObject = new BasicDBObject("colorCode",
 					colorNumber);
 			saveColorMetaData(colorObject.toString(), styleNumber);
@@ -260,16 +225,6 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.schawk.productmaster.feed.dao.ProductMasterFeedDao#updateColorMetaData
-	 * (java.lang.String, java.lang.String, java.lang.String)
-	 * 
-	 * update the color with given parameters and returns the updated document
-	 * as response
-	 */
 	@Override
 	public String updateColorMetaData(String colorMetaData, String styleNumber,
 			String colorNumber) throws Exception {
@@ -303,16 +258,6 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
 		return results;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.schawk.productmaster.feed.dao.ProductMasterFeedDao#updateSizeMetaData
-	 * (java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 * 
-	 * update the size with given parameters and returns the updated document as
-	 * response
-	 */
 	@Override
 	public String updateSizeMetaData(String sizeMetaData, String styleNumber,
 			String colorNumber, String sizeCode) throws Exception {
@@ -329,16 +274,6 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.schawk.productmaster.feed.dao.ProductMasterFeedDao#getIndexForSize
-	 * (java.lang.String, java.lang.String, java.lang.String)
-	 * 
-	 * it will recieve stylenumber,colorcode,sizecode and returns the index for
-	 * the given size code.
-	 */
 	@Override
 	public int getIndexForSize(String styleNumber, String colorCode,
 			String sizeCode) throws Exception {

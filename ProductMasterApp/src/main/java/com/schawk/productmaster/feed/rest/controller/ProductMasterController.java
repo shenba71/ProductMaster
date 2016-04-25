@@ -51,7 +51,7 @@ public class ProductMasterController {
     public String saveProductMetaDataStyle(@RequestBody String productJson)
             throws MongoException, Exception {
         LOG.debug("JSONRequest for Style recieved!!!");
-        return productMasterStagingService.saveStyleDatasToProductMetaData(productJson);
+        return productMasterStagingService.saveStyleDataToProductMetaData(productJson);
     }
 
     /**
@@ -102,7 +102,7 @@ public class ProductMasterController {
             productMetaData.put("vendor", vendor);
         }
 
-        return productMasterStagingService.saveStyleDatasToProductMetaData(productMetaData);
+        return productMasterStagingService.saveStyleDataToProductMetaData(productMetaData);
 
     }
 
@@ -142,7 +142,7 @@ public class ProductMasterController {
             productMetaData.put("vendor", vendor);
         }
 
-        return productMasterStagingService.updateStyleDatasToProductMetaData(productMetaData);
+        return productMasterStagingService.updateStyleDataToProductMetaData(productMetaData);
 
     }
 
@@ -167,7 +167,7 @@ public class ProductMasterController {
         if (!StringUtils.isEmpty(colorDescription)) {
             colorMetaData.put("colorDescription", colorDescription);
         }
-        return productMasterStagingService.saveColorDatasToProductMetadata(colorMetaData,
+        return productMasterStagingService.saveColorDataToProductMetadata(colorMetaData,
                 styleNumber);
 
     }
@@ -183,7 +183,7 @@ public class ProductMasterController {
     public String saveProductMetaDataColor(@PathVariable("styleNumber") String styleNumber,
             @RequestBody String colorMetaDataJson) throws Exception {
         LOG.debug("Color request recieved for Style " + styleNumber + " as JSON.");
-        return productMasterStagingService.saveColorDatasToProductMetadata(colorMetaDataJson,
+        return productMasterStagingService.saveColorDataToProductMetadata(colorMetaDataJson,
                 styleNumber);
 
     }
@@ -207,7 +207,7 @@ public class ProductMasterController {
         if (!StringUtils.isEmpty(colorDescription)) {
             colorMetaData.put("colorDescription", colorDescription);
         }
-        return productMasterStagingService.updateColorDatasToProductMetadata(colorMetaData,
+        return productMasterStagingService.updateColorDataToProductMetadata(colorMetaData,
                 styleNumber, colorNumber);
 
     }
@@ -237,7 +237,7 @@ public class ProductMasterController {
         if (!StringUtils.isEmpty(skuId)) {
             sizeMetaData.put("skuId", skuId);
         }
-        return productMasterStagingService.updateSizeDatasToProductMetadata(sizeMetaData,
+        return productMasterStagingService.updateSizeDataToProductMetadata(sizeMetaData,
                 styleNumber, colorNumber, sizeCode);
 
     }
@@ -268,7 +268,7 @@ public class ProductMasterController {
         if (!StringUtils.isEmpty(skuId)) {
             sizeMetaData.put("skuId", skuId);
         }
-        return productMasterStagingService.saveSizeDatasToProductMetadata(sizeMetaData, styleNumber,
+        return productMasterStagingService.saveSizeDataToProductMetadata(sizeMetaData, styleNumber,
                 colorNumber);
     }
 
@@ -286,7 +286,7 @@ public class ProductMasterController {
                     throws Exception {
         LOG.debug("Size request recieved for Style " + styleNumber + " Color" + colorNumber
                 + " as JSON.");
-        return productMasterStagingService.saveSizeDatasToProductMetadata(sizeMetaDataJson,
+        return productMasterStagingService.saveSizeDataToProductMetadata(sizeMetaDataJson,
                 styleNumber, colorNumber);
     }
 
