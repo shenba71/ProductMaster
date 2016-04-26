@@ -80,16 +80,16 @@ public class ExceptionTranslator {
 	@ExceptionHandler(CustomMongoException.class)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.FORBIDDEN)
-	public String duplicateKeyException(CustomMongoException exception) {
+	public ErrorDTO duplicateKeyException(CustomMongoException exception) {
 		String errorMessage;
 
 		if (exception.code == 11000) {
 			errorMessage = "Style Record already exists for "
 					+ exception.styleNumber;
 		} else
-			errorMessage = "Exception in Mongo operation"
-					+ exception.getMessage();
-		return errorMessage;
+			errorMessage = "Exception in Mongo operation"+exception.getMessage();
+					
+		return new ErrorDTO(errorMessage);
 
 	}
 
