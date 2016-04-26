@@ -43,6 +43,7 @@ public class ProductMasterSearchServiceImpl implements ProductMasterSearchServic
 
         String globalFields = globalSearchFields.replaceAll("(\\{|\\})", "");
         String[] searchFields = globalFields.split("=");
+        String response = null;
 
         //check if array size is two since the input would be q={styleNumber=12345,12346}
         String columnName = null;
@@ -71,7 +72,10 @@ public class ProductMasterSearchServiceImpl implements ProductMasterSearchServic
             columnName = SIZE_CODE_PREFIX.concat(columnName);
         }
 
-        return productMasterFeedDao.findProductByFields(columnName, columnValues, columnsToInclude);
+        if(StringUtils.isNotBlank(columnName) && columnValues != null) {
+        	response = productMasterFeedDao.findProductByFields(columnName, columnValues, columnsToInclude);
+        }
+        return response;
     }
 
     @Override
