@@ -1,5 +1,6 @@
 package com.schawk.productmaster.feed.service.impl;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +38,31 @@ public class ProductMasterSearchServiceImpl implements ProductMasterSearchServic
     }
 
     @Override
-    public String findProductByFields(String columnName, String[] columnValues,
-            String[] columnsToInclude) throws Exception {
+    public String findProductByFields(String globalSearchFields, String fieldsToInclude)
+            throws Exception {
+
+        String globalFields = globalSearchFields.replaceAll("(\\{|\\})", "");
+        String[] searchFields = globalFields.split("=");
+
+        //check if array size is two since the input would be q={styleNumber=12345,12346}
+        String columnName = null;
+        String columnValue = null;
+        if (searchFields.length == 2) {
+            columnName = searchFields[0];
+            columnValue = searchFields[1];
+        }
+
+        LOG.debug("Global search for field : " + columnName + " and value :" + columnValue);
+        String[] columnValues = null;
+        if (StringUtils.isNotBlank(columnValue)) {
+            columnValues = columnValue.split(",");
+        }
+
+        String[] columnsToInclude = null;
+        // check if include fields are present
+        if (StringUtils.isNotBlank(fieldsToInclude)) {
+            columnsToInclude = fieldsToInclude.split(",");
+        }
 
         //If the provided input simply contains colorCode/sizeCode then append appropriate column hierarchy based on DB
         if (COLOR_CODE.equalsIgnoreCase(columnName)) {
@@ -51,8 +75,13 @@ public class ProductMasterSearchServiceImpl implements ProductMasterSearchServic
     }
 
     @Override
-    public String globalSearch(String searchField) throws Exception {
-        return productMasterFeedDao.globalSearch(searchField);
+    public String globalSearch(String searchField, String fieldsToInclude) throws Exception {
+        String[] columnsToInclude = null;
+        // check if include fields are present
+        if (StringUtils.isNotBlank(fieldsToInclude)) {
+            columnsToInclude = fieldsToInclude.split(",");
+        }
+        return productMasterFeedDao.globalSearch(searchField, columnsToInclude);
     }
 
     @Override

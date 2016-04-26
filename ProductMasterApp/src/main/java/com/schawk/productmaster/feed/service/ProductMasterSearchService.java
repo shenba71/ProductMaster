@@ -34,17 +34,18 @@ public interface ProductMasterSearchService {
      * @return
      * @throws Exception
      */
-    public String findProductByFields(String columnName, String[] columnValues,
-            String[] columnsToInclude) throws Exception;
+    public String findProductByFields(String globalSearchFields, String fieldsToInclude)
+            throws Exception;
 
     /**
      * This is a global search applicable only to specified fields which are
      * given in text indexes
      * @param searchField
+     * @param fieldsToInclude 
      * @return
      * @throws Exception
      */
-    public String globalSearch(String searchField) throws Exception;
+    public String globalSearch(String searchField, String fieldsToInclude) throws Exception;
 
     /**
      * Search the particular product size with the specified style, color and size
@@ -66,4 +67,5 @@ public interface ProductMasterSearchService {
      */
     public String findProductSizesByStyleAndColor(String styleNumber, String colorCode)
             throws Exception;
+
 }

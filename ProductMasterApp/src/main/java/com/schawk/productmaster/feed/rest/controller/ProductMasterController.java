@@ -333,41 +333,19 @@ public class ProductMasterController {
             @RequestParam(value = "include", required = false) String fieldsToInclude)
                     throws Exception {
         String response = "";
-
         LOG.info("Query field : " + globalSearchFields + " Fields to include : " + fieldsToInclude);
+
         if (StringUtils.isNotBlank(globalSearchFields)) {
             if (globalSearchFields.startsWith("{")) {
-                globalSearchFields = globalSearchFields.replaceAll("(\\{|\\})", "");
-                String[] searchFields = globalSearchFields.split("=");
-
-                //check if array size is two since the input would be q={styleNumber=12345,12346}
-                String columnName = null;
-                String columnValue = null;
-                if (searchFields.length == 2) {
-                    columnName = searchFields[0];
-                    columnValue = searchFields[1];
-                }
-
-                LOG.debug("Global search for field : " + columnName + " and value :" + columnValue);
-                String[] columnValues = null;
-                if (StringUtils.isNotBlank(columnValue)) {
-                    columnValues = columnValue.split(",");
-                }
-
-                String[] columnsToInclude = null;
-                // check if include fields are present
-                if (StringUtils.isNotBlank(fieldsToInclude)) {
-                    columnsToInclude = fieldsToInclude.split(",");
-                }
-                response = productMasterSearchservice.findProductByFields(columnName, columnValues,
-                        columnsToInclude);
+                response = productMasterSearchservice.findProductByFields(globalSearchFields,
+                        fieldsToInclude);
             } else {
                 // global search is case insensitive
-                response = productMasterSearchservice.globalSearch(globalSearchFields);
+                response = productMasterSearchservice.globalSearch(globalSearchFields,
+                        fieldsToInclude);
             }
         }
         return response;
-
     }
 
     /**

@@ -107,9 +107,10 @@ public interface ProductMasterFeedDao {
      * This is a global search applicable only to specified fields which are
      * given in text indexes
      * @param searchField
+     * @param columnsToInclude 
      * @throws Exception
      */
-    public String globalSearch(String searchField) throws Exception;
+    public String globalSearch(String searchField, String[] columnsToInclude) throws Exception;
 
     /**
      * Retrieve product size based on style, color and size

@@ -181,8 +181,7 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         BasicDBObject object = new BasicDBObject();
         object.append("$addToSet", sizeObject);
         // If a size record was not present, then allow to insert
-        if (("No Product record found for given style, color and size").equalsIgnoreCase(
-                findProductByStyleColorAndSize(styleNumber, colorNumber, sizeCode))) {
+        if (findProductByStyleColorAndSize(styleNumber, colorNumber, sizeCode).length() == 0) {
             collection.update(queryObject, object, true, false);
             response = findProductByStyle(styleNumber, null);
             ;
@@ -311,16 +310,25 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
     }
 
     @Override
-    public String globalSearch(String searchField) throws Exception {
+    public String globalSearch(String searchField, String[] columnsToInclude) throws Exception {
         LOG.info("Inside globalSearch method");
         String searchResult = "";
         List<String> resultList = new ArrayList<String>();
         DBCollection collection = mongoTemplate.getDb().getCollection(COLLECTION_NAME);
         DBObject searchQuery = QueryBuilder.start().text(searchField).get();
-        DBCursor cursor = collection.find(searchQuery);
 
-        while (cursor.hasNext()) {
-            String resultString = cursor.next().toString();
+        BasicDBObject fieldsToInclude = new BasicDBObject();
+        // columns which are included would be displayed
+        if (columnsToInclude != null) {
+            for (String FieldName : columnsToInclude) {
+                fieldsToInclude.put(FieldName, 1);
+            }
+        }
+
+        DBCursor productCursor = collection.find(searchQuery, fieldsToInclude);
+
+        while (productCursor.hasNext()) {
+            String resultString = productCursor.next().toString();
             LOG.debug("Results :" + resultString);
             resultList.add(resultString);
             LOG.debug("Results size" + resultList.size());
