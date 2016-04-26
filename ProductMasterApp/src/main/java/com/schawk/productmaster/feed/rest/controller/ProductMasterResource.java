@@ -29,9 +29,9 @@ import io.swagger.annotations.ApiOperation;
  *
  */
 @RestController
-@Api(value = "product", description = "Save,update and searches the product metadata")
+@Api(value = "product", description = "Operations in ProductMaster Application")
 @RequestMapping("/product")
-public class ProductMasterController {
+public class ProductMasterResource {
 
     @Autowired
     private ProductMasterStagingService productMasterStagingService;
@@ -39,7 +39,7 @@ public class ProductMasterController {
     @Autowired
     private ProductMasterSearchService productMasterSearchservice;
 
-    private static final Logger LOG = LoggerFactory.getLogger(ProductMasterController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProductMasterResource.class);
 
     /**
      * @param productJson
@@ -108,7 +108,7 @@ public class ProductMasterController {
 
     @RequestMapping(value = "/styles", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("update the style metadata if already present else creates new style record")
-    public String updateStyleMetaData(
+    public String updateProductMetaDataStyle(
             @RequestParam(value = "style_number", required = true) String styleNumber,
             @RequestParam(value = "product_name", required = false) String productName,
             @RequestParam(value = "product_type", required = false) String productType,
