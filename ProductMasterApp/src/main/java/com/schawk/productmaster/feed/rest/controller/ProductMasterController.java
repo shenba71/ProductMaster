@@ -332,7 +332,7 @@ public class ProductMasterController {
             @RequestParam(value = "q", required = false) String globalSearchFields,
             @RequestParam(value = "include", required = false) String fieldsToInclude)
                     throws Exception {
-        String response = null;
+        String response = "";
 
         LOG.info("Query field : " + globalSearchFields + " Fields to include : " + fieldsToInclude);
         if (StringUtils.isNotBlank(globalSearchFields)) {
@@ -365,8 +365,6 @@ public class ProductMasterController {
                 // global search is case insensitive
                 response = productMasterSearchservice.globalSearch(globalSearchFields);
             }
-        } else {
-            response = "Search fields are empty";
         }
         return response;
 
