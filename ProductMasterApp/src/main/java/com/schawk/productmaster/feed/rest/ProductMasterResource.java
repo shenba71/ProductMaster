@@ -1,4 +1,4 @@
-package com.schawk.productmaster.feed.rest.controller;
+package com.schawk.productmaster.feed.rest;
 
 import java.util.HashMap;
 import java.util.Map;
