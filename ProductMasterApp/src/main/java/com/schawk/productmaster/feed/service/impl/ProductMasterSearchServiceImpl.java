@@ -52,13 +52,7 @@ public class ProductMasterSearchServiceImpl implements ProductMasterSearchServic
 
     @Override
     public String globalSearch(String searchField) throws Exception {
-
-        if (searchField != null && searchField != "") {
-            return productMasterFeedDao.globalSearch(searchField);
-        } else {
-            LOG.debug("Search field is empty");
-            return "Please enter a text to search";
-        }
+        return productMasterFeedDao.globalSearch(searchField);
     }
 
     @Override

@@ -10,8 +10,7 @@ public interface ProductMasterFeedDao {
      * @param productMetaData
      * @return the inserted record as response
      * @throws Exception
-     * 
-     *             recieves the input metadata for style and inserts in to DB
+     * Receives the input metadata for style and inserts in to DB
      */
     public String saveProductMetaDataStyle(String productMetaData) throws Exception;
 
@@ -20,8 +19,7 @@ public interface ProductMasterFeedDao {
      * @param styleNumber
      * @return the inserted record as response
      * @throws Exception
-     * 
-     *             recieves input colormetadata json and inserts into DB
+     * Receives input colormetadata json and inserts into DB
      */
     public String saveColorMetaData(String colorMetaData, String styleNumber) throws Exception;
 
@@ -31,8 +29,7 @@ public interface ProductMasterFeedDao {
      * @param colorNumber
      * @return the inserted record as response
      * @throws Exception
-     * 
-     *             recieves input sizemetadata json and inserts into DB
+     * Receives input sizemetadata json and inserts into DB
      */
     public String saveSizeMetaData(String sizeMetaData, String styleNumber, String colorNumber)
             throws Exception;
@@ -43,9 +40,8 @@ public interface ProductMasterFeedDao {
      * @param colorNumber
      * @return the updated record as response
      * @throws Exception
-     * 
-     *             recieves updated color metadata and update if record already
-     *             exists else creates new record
+     * Receives updated color metadata and update if record already
+     * exists else creates new record
      */
     public String updateColorMetaData(String colorMetaData, String styleNumber, String colorNumber)
             throws Exception;
@@ -57,9 +53,8 @@ public interface ProductMasterFeedDao {
      * @param sizeCode
      * @return the updated record as response
      * @throws Exception
-     * 
-     *             recieves updated size metadata and update if record already
-     *             exists else creates new record
+     * Receives updated size metadata and update if record already
+     * exists else creates new record
      */
     public String updateSizeMetaData(String sizeMetaData, String styleNumber, String colorNumber,
             String sizeCode) throws Exception;
@@ -91,9 +86,8 @@ public interface ProductMasterFeedDao {
      * @param productMetaData
      * @return the updated record as response
      * @throws Exception
-     * 
-     *             recieves updated style metadata and update if record already
-     *             exists else creates new record
+     * Receives updated style metadata and update if record already
+     * exists else creates new record
      */
     public String updateProductMetaDataStyle(String productMetaData) throws Exception;
 
@@ -109,6 +103,12 @@ public interface ProductMasterFeedDao {
     public String findProductByFields(String columnName, String[] columnValues,
             String[] columnsToInclude) throws Exception;
 
+    /**
+     * This is a global search applicable only to specified fields which are
+     * given in text indexes
+     * @param searchField
+     * @throws Exception
+     */
     public String globalSearch(String searchField) throws Exception;
 
     /**
