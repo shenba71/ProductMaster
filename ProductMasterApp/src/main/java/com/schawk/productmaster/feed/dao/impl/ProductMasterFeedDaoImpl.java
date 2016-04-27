@@ -32,6 +32,7 @@ import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 import com.schawk.productmaster.feed.dao.ProductMasterFeedDao;
 import com.schawk.productmaster.web.rest.errors.CustomMongoException;
+import com.schawk.productmaster.web.rest.errors.ResourceNotFoundException;
 
 /**
  * @author shenbagaganesh.param
@@ -151,11 +152,18 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         BasicDBObject objectToInsert = new BasicDBObject();
         objectToInsert.append("$addToSet", colorObject).append("$setOnInsert", styleObject);
         // insertion will happen only if record not present for given color
-        if (findProductByStyleAndColor(styleNumber, colorNumber).length() == 0) {
+        try {
+            if (findProductByStyleAndColor(styleNumber, colorNumber).length() > 0) {
+                LOG.debug("Record already exists");
+                throw new CustomMongoException("Record already exists for given style "
+                        + styleNumber + "color" + colorNumber);
+            }
+            // the above method for find will throw ResourceNotFoundException if record not exists.
+            // In our scenario, insertion needs to be done only if the record not present. So we suppress the exception and perform insertion.
+        } catch (ResourceNotFoundException exception) {
+            LOG.error(exception.getMessage());
             collection.update(styleObject, objectToInsert, true, false);
             response = findProductByStyle(styleNumber, null);
-        } else {
-            response = "Record already exists";
         }
         return response;
     }
@@ -174,20 +182,33 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         BasicDBObject sizeObject = new BasicDBObject("colors.$.color.sizes", sizeMetaDataObject);
         // If style and color record was not already present, then wil create
         // style and color record before inserting size metadata
-        if ((findProductByStyle(styleNumber, null).length() == 0)
-                || findProductByStyleAndColor(styleNumber, colorNumber).length() == 0) {
+        try {
+            if (findProductByStyleAndColor(styleNumber, colorNumber).length() > 0) {
+                LOG.debug("Style record exists for given values.");
+            }
+            // the above method for find will throw ResourceNotFoundException if record not exists.
+            // In our scenario, insertion needs to be done only if the record not present. So we suppress the exception and perform insertion.
+        } catch (ResourceNotFoundException ex) {
+            LOG.debug("Style record not exists for given value");
             BasicDBObject colorObject = new BasicDBObject("colorCode", colorNumber);
             saveColorMetaData(colorObject.toString(), styleNumber);
         }
         BasicDBObject object = new BasicDBObject();
         object.append("$addToSet", sizeObject);
         // If a size record was not present, then allow to insert
-        if (findProductByStyleColorAndSize(styleNumber, colorNumber, sizeCode).length() == 0) {
+        try {
+            if (findProductByStyleColorAndSize(styleNumber, colorNumber, sizeCode).length() > 0) {
+                LOG.debug("Size Record already exists");
+                LOG.debug("Record already exists");
+                throw new CustomMongoException("Record already exists for given style "
+                        + styleNumber + "color" + colorNumber + "size " + sizeCode);
+            }
+            // the above method for find will throw ResourceNotFoundException if record not exists.
+            // In our scenario, insertion needs to be done only if the record not present. So we suppress the exception and perform insertion.
+        } catch (ResourceNotFoundException ex) {
+            LOG.debug("Size record not exists.." + ex.getMessage());
             collection.update(queryObject, object, true, false);
             response = findProductByStyle(styleNumber, null);
-            ;
-        } else {
-            response = "SIZE RECORD ALREADY EXISTS";
         }
 
         return response;
@@ -259,6 +280,8 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
 
         if (CollectionUtils.isEmpty(searchResults) == false) {
             results = searchResults.toString();
+        } else {
+            throw new ResourceNotFoundException("No Results Found for coloumn " + columnName);
         }
         return results;
     }
@@ -284,6 +307,9 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         String searchResult = mongoTemplate.findOne(query, String.class, COLLECTION_NAME);
         if (StringUtils.isEmpty(searchResult) == false) {
             results = searchResult.toString();
+        } else {
+            throw new ResourceNotFoundException("No results found for given style " + styleNumber
+                    + "and color" + colorNumber);
         }
         return results;
     }
@@ -306,6 +332,8 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         String searchResult = mongoTemplate.findOne(query, String.class, COLLECTION_NAME);
         if (StringUtils.isEmpty(searchResult) == false) {
             results = searchResult.toString();
+        } else {
+            throw new ResourceNotFoundException("No results found for given style " + styleNumber);
         }
         return results;
     }
@@ -338,7 +366,8 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         if (CollectionUtils.isEmpty(resultList) == false) {
             searchResult = resultList.toString();
         } else {
-        	throw new ResourceNotFoundException();
+            throw new ResourceNotFoundException("No Records found for given search criteria"
+                    + searchField);
         }
         return searchResult;
     }
@@ -385,6 +414,9 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         LOG.debug("searchResult : " + searchResult);
         if (StringUtils.isEmpty(searchResult) == false) {
             results = searchResult;
+        } else {
+            throw new ResourceNotFoundException("No results found for given style " + styleNumber
+                    + "and color" + colorCode + "and size" + sizeCode);
         }
         return results;
     }
@@ -416,6 +448,9 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         LOG.debug("searchResult : " + searchResult);
         if (StringUtils.isEmpty(searchResult) == false) {
             results = searchResult.toString();
+        } else {
+            throw new ResourceNotFoundException("No size records found for given style "
+                    + styleNumber + "and color" + colorCode);
         }
         return results;
     }

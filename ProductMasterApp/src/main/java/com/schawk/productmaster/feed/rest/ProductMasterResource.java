@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mongodb.MongoException;
 import com.schawk.productmaster.feed.service.ProductMasterSearchService;
 import com.schawk.productmaster.feed.service.ProductMasterStagingService;
+import com.schawk.productmaster.web.rest.errors.InvalidParameterException;
 import com.schawk.productmaster.web.rest.errors.MissingParameterException;
 import com.schawk.productmaster.web.rest.util.ProductMasterRestUtil;
 
@@ -253,18 +254,20 @@ public class ProductMasterResource {
     public String findProductByFields(
             @RequestParam(value = "q", required = true) String globalSearchFields,
             @RequestParam(value = "include", required = false) String fieldsToInclude)
-                    throws Exception {
+            throws Exception {
         LOG.info("Query field : " + globalSearchFields + " Fields to include : " + fieldsToInclude);
-        
+
         if (StringUtils.isNotBlank(globalSearchFields)) {
-        	       	
-        	String isSearchFieldPresent = String.valueOf(globalSearchFields.startsWith("{") && globalSearchFields.endsWith("}"));
-        	return productMasterSearchservice.findProducts(globalSearchFields, fieldsToInclude, isSearchFieldPresent);		  
-        	
+
+            String isSearchFieldPresent = String.valueOf(globalSearchFields.startsWith("{")
+                    && globalSearchFields.endsWith("}"));
+            return productMasterSearchservice.findProducts(globalSearchFields, fieldsToInclude,
+                    isSearchFieldPresent);
+
         } else {
-        	throw new InvalidParameterException();
+            throw new InvalidParameterException();
         }
-                    
+
     }
 
     /**

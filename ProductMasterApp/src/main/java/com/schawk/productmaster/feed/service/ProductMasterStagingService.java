@@ -2,8 +2,6 @@ package com.schawk.productmaster.feed.service;
 
 import java.util.Map;
 
-import com.schawk.productmaster.web.rest.errors.MissingParameterException;
-
 /**
  * @author shenbagaganesh.param
  *
