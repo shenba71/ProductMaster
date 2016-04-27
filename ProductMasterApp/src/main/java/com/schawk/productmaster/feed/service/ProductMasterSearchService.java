@@ -24,7 +24,7 @@ public interface ProductMasterSearchService {
      * @return
      * @throws Exception
      */
-    public String findProductByStyle(String styleNumber, String[] field) throws Exception;
+    public String findProductByStyle(String styleNumber, String field) throws Exception;
 
     /**
      * This is a refined search applicable only to specified fields
@@ -67,5 +67,16 @@ public interface ProductMasterSearchService {
      */
     public String findProductSizesByStyleAndColor(String styleNumber, String colorCode)
             throws Exception;
+
+    /**
+     * Search for products based on parameters
+     * @param globalSearchFields
+     * @param fieldsToInclude
+     * @param isSearchFieldPresent 
+     * @return
+     * @throws Exception
+     */
+    public String findProducts(String globalSearchFields, String fieldsToInclude,
+            String isSearchFieldPresent) throws Exception;
 
 }

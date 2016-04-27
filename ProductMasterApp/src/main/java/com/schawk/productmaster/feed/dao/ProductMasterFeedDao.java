@@ -1,5 +1,7 @@
 package com.schawk.productmaster.feed.dao;
 
+import java.util.List;
+
 import org.json.JSONArray;
 
 public interface ProductMasterFeedDao {
@@ -80,7 +82,7 @@ public interface ProductMasterFeedDao {
      * @return
      * @throws Exception
      */
-    public String findProductByStyle(String styleNumber, String[] field) throws Exception;
+    public String findProductByStyle(String styleNumber, List<String> field) throws Exception;
 
     /**
      * @param productMetaData
@@ -101,7 +103,7 @@ public interface ProductMasterFeedDao {
      * @throws Exception
      */
     public String findProductByFields(String columnName, String[] columnValues,
-            String[] columnsToInclude) throws Exception;
+            List<String> columnsToInclude) throws Exception;
 
     /**
      * This is a global search applicable only to specified fields which are
@@ -110,7 +112,7 @@ public interface ProductMasterFeedDao {
      * @param columnsToInclude 
      * @throws Exception
      */
-    public String globalSearch(String searchField, String[] columnsToInclude) throws Exception;
+    public String globalSearch(String searchField, List<String> columnsToInclude) throws Exception;
 
     /**
      * Retrieve product size based on style, color and size

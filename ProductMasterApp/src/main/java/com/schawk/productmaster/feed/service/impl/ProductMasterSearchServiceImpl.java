@@ -1,5 +1,7 @@
 package com.schawk.productmaster.feed.service.impl;
 
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.schawk.productmaster.feed.dao.ProductMasterFeedDao;
 import com.schawk.productmaster.feed.dao.impl.ProductMasterFeedDaoImpl;
 import com.schawk.productmaster.feed.service.ProductMasterSearchService;
+import com.schawk.productmaster.util.StringUtil;
 
 /**
  * @author sharanya.ramamoorthy
@@ -27,14 +30,21 @@ public class ProductMasterSearchServiceImpl implements ProductMasterSearchServic
     private ProductMasterFeedDao productMasterFeedDao;
 
     @Override
-    public String findProductByStyleAndColor(String styleNumber, String colorCode)
-            throws Exception {
+    public String findProductByStyleAndColor(String styleNumber, String colorCode) throws Exception {
         return productMasterFeedDao.findProductByStyleAndColor(styleNumber, colorCode);
     }
 
     @Override
-    public String findProductByStyle(String styleNumber, String[] field) throws Exception {
-        return productMasterFeedDao.findProductByStyle(styleNumber, field);
+    public String findProductByStyle(String styleNumber, String field) throws Exception {
+        List<String> fieldsToInclude = null;
+        if (StringUtils.isNotBlank(field)) {
+            for (String string : field.split(",")) {
+                fieldsToInclude.add(StringUtil.getCamelCase(string));
+            }
+
+        }
+
+        return productMasterFeedDao.findProductByStyle(styleNumber, fieldsToInclude);
     }
 
     @Override
@@ -49,7 +59,7 @@ public class ProductMasterSearchServiceImpl implements ProductMasterSearchServic
         String columnName = null;
         String columnValue = null;
         if (searchFields.length == 2) {
-            columnName = searchFields[0];
+            columnName = StringUtil.getCamelCase(searchFields[0]);
             columnValue = searchFields[1];
         }
 
@@ -59,10 +69,12 @@ public class ProductMasterSearchServiceImpl implements ProductMasterSearchServic
             columnValues = columnValue.split(",");
         }
 
-        String[] columnsToInclude = null;
+        List<String> columnsToInclude = null;
         // check if include fields are present
         if (StringUtils.isNotBlank(fieldsToInclude)) {
-            columnsToInclude = fieldsToInclude.split(",");
+            for (String string : fieldsToInclude.split(",")) {
+                columnsToInclude.add(StringUtil.getCamelCase(string));
+            }
         }
 
         //If the provided input simply contains colorCode/sizeCode then append appropriate column hierarchy based on DB
@@ -72,18 +84,21 @@ public class ProductMasterSearchServiceImpl implements ProductMasterSearchServic
             columnName = SIZE_CODE_PREFIX.concat(columnName);
         }
 
-        if(StringUtils.isNotBlank(columnName) && columnValues != null) {
-        	response = productMasterFeedDao.findProductByFields(columnName, columnValues, columnsToInclude);
+        if (StringUtils.isNotBlank(columnName) && columnValues != null) {
+            response = productMasterFeedDao.findProductByFields(columnName, columnValues,
+                    columnsToInclude);
         }
         return response;
     }
 
     @Override
     public String globalSearch(String searchField, String fieldsToInclude) throws Exception {
-        String[] columnsToInclude = null;
+        List<String> columnsToInclude = null;
         // check if include fields are present
         if (StringUtils.isNotBlank(fieldsToInclude)) {
-            columnsToInclude = fieldsToInclude.split(",");
+            for (String string : fieldsToInclude.split(",")) {
+                columnsToInclude.add(StringUtil.getCamelCase(string));
+            }
         }
         return productMasterFeedDao.globalSearch(searchField, columnsToInclude);
     }
@@ -98,5 +113,24 @@ public class ProductMasterSearchServiceImpl implements ProductMasterSearchServic
     public String findProductSizesByStyleAndColor(String styleNumber, String colorCode)
             throws Exception {
         return productMasterFeedDao.findProductSizesByStyleAndColor(styleNumber, colorCode);
+    }
+
+    @Override
+    public String findProducts(String globalSearchFields, String fieldsToInclude,
+            String isSearchFieldPresent) throws Exception {
+        String response = "";
+        if (StringUtils.isNotBlank(globalSearchFields)) {
+
+            switch (isSearchFieldPresent) {
+            case "true":
+                response = findProductByFields(globalSearchFields, fieldsToInclude);
+                break;
+            default:
+                // global search is case insensitive
+                response = globalSearch(globalSearchFields, fieldsToInclude);
+                break;
+            }
+        }
+        return response;
     }
 }

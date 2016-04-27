@@ -48,8 +48,7 @@ public class ProductMasterStagingServiceImpl implements ProductMasterStagingServ
     }
 
     @Override
-    public String updateStyleDataToProductMetaData(Map<String, String> productMap)
-            throws Exception {
+    public String updateStyleDataToProductMetaData(Map<String, String> productMap) throws Exception {
         String productInputJson = convertMapToJson(productMap);
         LOG.debug("Request in JSON format.." + productInputJson);
         return productMasterFeedDao.updateProductMetaDataStyle(productInputJson);
@@ -132,8 +131,8 @@ public class ProductMasterStagingServiceImpl implements ProductMasterStagingServ
     }
 
     @Override
-    public String updateColorDataToProductMetadata(Map<String, String> valueMap, String styleNumber,
-            String colorNumber) throws Exception {
+    public String updateColorDataToProductMetadata(Map<String, String> valueMap,
+            String styleNumber, String colorNumber) throws Exception {
         String type = "color";
         String response = null;
         String updatedColorData = null;
