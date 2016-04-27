@@ -33,7 +33,7 @@ import com.schawk.productmaster.web.rest.util.ProductMasterRestUtil;
  *
  */
 @RestController
-@Api(value = "ProductMasterResource", description = "Operations in ProductMaster Application")
+@Api(value = "Product Master Resource", description = "Operations in ProductMaster Application")
 @RequestMapping("/product")
 public class ProductMasterResource {
 
