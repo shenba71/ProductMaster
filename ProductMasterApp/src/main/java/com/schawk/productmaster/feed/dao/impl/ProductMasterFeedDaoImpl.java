@@ -241,7 +241,7 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
 
     @Override
     public String findProductByFields(String columnName, String[] columnValues,
-            String[] columnsToInclude) throws Exception {
+            List<String> columnsToInclude) throws Exception {
         LOG.info("Search for multiple style numbers and display specified columns");
         String results = "";
         Query query = new Query();
@@ -288,7 +288,7 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
     }
 
     @Override
-    public String findProductByStyle(String styleNumber, String[] field) throws Exception {
+    public String findProductByStyle(String styleNumber, List<String> field) throws Exception {
         LOG.info("Search for style numbers");
         String results = "";
         Query query = new Query();
@@ -310,7 +310,7 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
     }
 
     @Override
-    public String globalSearch(String searchField, String[] columnsToInclude) throws Exception {
+    public String globalSearch(String searchField, List<String> columnsToInclude) throws Exception {
         LOG.info("Inside globalSearch method");
         String searchResult = "";
         List<String> resultList = new ArrayList<String>();

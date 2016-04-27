@@ -2,6 +2,8 @@ package com.schawk.productmaster.feed.service;
 
 import java.util.Map;
 
+import com.schawk.productmaster.web.rest.errors.MissingParameterException;
+
 /**
  * @author shenbagaganesh.param
  *
@@ -113,4 +115,5 @@ public interface ProductMasterStagingService {
      *json and pass it to DAO
      */
     public String updateStyleDataToProductMetaData(Map<String, String> productMap) throws Exception;
-}
+    
+    }

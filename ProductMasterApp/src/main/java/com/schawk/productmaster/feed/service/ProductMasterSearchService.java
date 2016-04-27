@@ -24,7 +24,7 @@ public interface ProductMasterSearchService {
      * @return
      * @throws Exception
      */
-    public String findProductByStyle(String styleNumber, String[] field) throws Exception;
+    public String findProductByStyle(String styleNumber, String field) throws Exception;
 
     /**
      * This is a refined search applicable only to specified fields

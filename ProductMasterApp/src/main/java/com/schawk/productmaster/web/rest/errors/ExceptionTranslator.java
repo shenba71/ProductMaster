@@ -92,6 +92,13 @@ public class ExceptionTranslator {
 		return new ErrorDTO(errorMessage);
 
 	}
+	
+	@ExceptionHandler(MissingParameterException.class)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+	public ErrorDTO missingParameterException(MissingParameterException exception){
+		return new ErrorDTO(exception.getMessage());
+	}
 
 	@ExceptionHandler(MissingServletRequestParameterException.class)
 	@ResponseBody

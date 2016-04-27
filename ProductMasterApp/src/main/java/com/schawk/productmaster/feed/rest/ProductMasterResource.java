@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mongodb.MongoException;
 import com.schawk.productmaster.feed.service.ProductMasterSearchService;
 import com.schawk.productmaster.feed.service.ProductMasterStagingService;
+import com.schawk.productmaster.web.rest.errors.MissingParameterException;
+import com.schawk.productmaster.web.rest.util.ProductMasterRestUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,7 +31,7 @@ import io.swagger.annotations.ApiOperation;
  *
  */
 @RestController
-@Api(value = "product", description = "Operations in ProductMaster Application")
+@Api(value = "ProductMasterResource", description = "Operations in ProductMaster Application")
 @RequestMapping("/product")
 public class ProductMasterResource {
 
@@ -68,40 +70,13 @@ public class ProductMasterResource {
      */
     @RequestMapping(value = "/styles", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("store the style metadata recieved as request parameters in MongoDB")
-    public String saveProductMetaDataStyle(
-            @RequestParam(value = "style_number", required = true) String styleNumber,
-            @RequestParam(value = "product_name", required = false) String productName,
-            @RequestParam(value = "product_type", required = false) String productType,
-            @RequestParam(value = "category", required = false) String category,
-            @RequestParam(value = "gender", required = false) String gender,
-            @RequestParam(value = "product_description", required = false) String productDescription,
-            @RequestParam(value = "division", required = false) String division,
-            @RequestParam(value = "vendor", required = false) String vendor) throws Exception {
+    public String saveProductMetaDataStyle(@RequestParam Map<String,String> params) throws Exception {
         LOG.debug("Request For Style Recieved via Request Parameters...");
         Map<String, String> productMetaData = new HashMap<String, String>();
-        productMetaData.put("styleNumber", styleNumber);
-        if (!StringUtils.isEmpty(productName)) {
-            productMetaData.put("productName", productName);
+        productMetaData = ProductMasterRestUtil.checkAndconvertParamsToCamelCase(params);
+        if(!productMetaData.containsKey("styleNumber")){
+        	throw new MissingParameterException("Request parameter should contain Style Number");
         }
-        if (!StringUtils.isEmpty(productType)) {
-            productMetaData.put("productType", productType);
-        }
-        if (!StringUtils.isEmpty(category)) {
-            productMetaData.put("catagory", category);
-        }
-        if (!StringUtils.isEmpty(gender)) {
-            productMetaData.put("gender", gender);
-        }
-        if (!StringUtils.isEmpty(productDescription)) {
-            productMetaData.put("productDescription", productDescription);
-        }
-        if (!StringUtils.isEmpty(division)) {
-            productMetaData.put("division", division);
-        }
-        if (!StringUtils.isEmpty(vendor)) {
-            productMetaData.put("vendor", vendor);
-        }
-
         return productMasterStagingService.saveStyleDataToProductMetaData(productMetaData);
 
     }
@@ -109,39 +84,13 @@ public class ProductMasterResource {
     @RequestMapping(value = "/styles", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("update the style metadata if already present else creates new style record")
     public String updateProductMetaDataStyle(
-            @RequestParam(value = "style_number", required = true) String styleNumber,
-            @RequestParam(value = "product_name", required = false) String productName,
-            @RequestParam(value = "product_type", required = false) String productType,
-            @RequestParam(value = "category", required = false) String category,
-            @RequestParam(value = "gender", required = false) String gender,
-            @RequestParam(value = "product_description", required = false) String productDescription,
-            @RequestParam(value = "division", required = false) String division,
-            @RequestParam(value = "vendor", required = false) String vendor) throws Exception {
+            @RequestParam Map<String,String> params) throws Exception {
         LOG.debug("Request For Style Recieved via Request Parameters...");
         Map<String, String> productMetaData = new HashMap<String, String>();
-        productMetaData.put("styleNumber", styleNumber);
-        if (!StringUtils.isEmpty(productName)) {
-            productMetaData.put("productName", productName);
+        productMetaData = ProductMasterRestUtil.checkAndconvertParamsToCamelCase(params);
+        if(!productMetaData.containsKey("styleNumber")){
+        	throw new MissingParameterException("Request parameter should contain Style Number");
         }
-        if (!StringUtils.isEmpty(productType)) {
-            productMetaData.put("productType", productType);
-        }
-        if (!StringUtils.isEmpty(category)) {
-            productMetaData.put("catagory", category);
-        }
-        if (!StringUtils.isEmpty(gender)) {
-            productMetaData.put("gender", gender);
-        }
-        if (!StringUtils.isEmpty(productDescription)) {
-            productMetaData.put("productDescription", productDescription);
-        }
-        if (!StringUtils.isEmpty(division)) {
-            productMetaData.put("division", division);
-        }
-        if (!StringUtils.isEmpty(vendor)) {
-            productMetaData.put("vendor", vendor);
-        }
-
         return productMasterStagingService.updateStyleDataToProductMetaData(productMetaData);
 
     }
@@ -156,16 +105,13 @@ public class ProductMasterResource {
     @RequestMapping(value = "/styles/{styleNumber}/colors", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("store the color metadata recieved as request parameters in MongoDB")
     public String saveProductMetaDataColor(@PathVariable("styleNumber") String styleNumber,
-            @RequestParam(value = "color_code", required = true) String colorCode,
-            @RequestParam(value = "color_description", required = false) String colorDescription)
+            @RequestParam Map<String,String> params)
                     throws Exception {
         LOG.debug("Color request recieved for Style " + styleNumber + " via request parameters.");
         Map<String, String> colorMetaData = new HashMap<String, String>();
-        if (!StringUtils.isEmpty(colorCode)) {
-            colorMetaData.put("colorCode", colorCode);
-        }
-        if (!StringUtils.isEmpty(colorDescription)) {
-            colorMetaData.put("colorDescription", colorDescription);
+        colorMetaData = ProductMasterRestUtil.checkAndconvertParamsToCamelCase(params);
+        if(!colorMetaData.containsKey("colorCode")){
+        	throw new MissingParameterException("Request parameter should contain colorCode");
         }
         return productMasterStagingService.saveColorDataToProductMetadata(colorMetaData,
                 styleNumber);
@@ -196,17 +142,15 @@ public class ProductMasterResource {
      * @return the updated document as response
      * @throws Exception
      */
-    @RequestMapping(value = "/styles/{styleNumber}/colors/{colorNumber}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/styles/{styleNumber}/colors/{colorNumber}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("update the color metadata if already present else creates new color record")
     public String updateProductMetaDataColor(@PathVariable("styleNumber") String styleNumber,
             @PathVariable("colorNumber") String colorNumber,
-            @RequestParam(value = "color_description", required = false) String colorDescription)
+    		@RequestParam Map<String,String> params)
                     throws Exception {
         LOG.debug("Update request for Style : " + styleNumber + " color : " + colorNumber);
         Map<String, String> colorMetaData = new HashMap<String, String>();
-        if (!StringUtils.isEmpty(colorDescription)) {
-            colorMetaData.put("colorDescription", colorDescription);
-        }
+        colorMetaData = ProductMasterRestUtil.checkAndconvertParamsToCamelCase(params);
         return productMasterStagingService.updateColorDataToProductMetadata(colorMetaData,
                 styleNumber, colorNumber);
 
@@ -221,22 +165,16 @@ public class ProductMasterResource {
      * @return the updated document as response
      * @throws Exception
      */
-    @RequestMapping(value = "/styles/{styleNumber}/colors/{colorNumber}/sizes/{sizeCode}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/styles/{styleNumber}/colors/{colorNumber}/sizes/{sizeCode}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("update the size metadata if already present else creates new size record")
     public String updateProductMetaDataSize(@PathVariable("styleNumber") String styleNumber,
             @PathVariable("colorNumber") String colorNumber,
             @PathVariable("sizeCode") String sizeCode,
-            @RequestParam(value = "upc", required = false) String upc,
-            @RequestParam(value = "sku_id", required = false) String skuId) throws Exception {
+            @RequestParam Map<String,String> params) throws Exception {
         LOG.debug("Update request for size :" + styleNumber + " Color : " + colorNumber + " size : "
                 + sizeCode);
         Map<String, String> sizeMetaData = new HashMap<String, String>();
-        if (!StringUtils.isEmpty(upc)) {
-            sizeMetaData.put("upc", upc);
-        }
-        if (!StringUtils.isEmpty(skuId)) {
-            sizeMetaData.put("skuId", skuId);
-        }
+        sizeMetaData = ProductMasterRestUtil.checkAndconvertParamsToCamelCase(params);
         return productMasterStagingService.updateSizeDataToProductMetadata(sizeMetaData,
                 styleNumber, colorNumber, sizeCode);
 
@@ -255,18 +193,13 @@ public class ProductMasterResource {
     @ApiOperation("store the size metadata recieved as request parameters in MongoDB")
     public String saveProductMetaDataSize(@PathVariable("styleNumber") String styleNumber,
             @PathVariable("colorNumber") String colorNumber,
-            @RequestParam(value = "size_code", required = true) String sizeCode,
-            @RequestParam(value = "upc", required = false) String upc,
-            @RequestParam(value = "sku_id", required = false) String skuId) throws Exception {
+            @RequestParam Map<String,String> params) throws Exception {
         LOG.debug("Size request recieved for Style " + styleNumber + " Color" + colorNumber
                 + " as request parameters.");
         Map<String, String> sizeMetaData = new HashMap<String, String>();
-        sizeMetaData.put("sizeCode", sizeCode);
-        if (!StringUtils.isEmpty(upc)) {
-            sizeMetaData.put("upc", upc);
-        }
-        if (!StringUtils.isEmpty(skuId)) {
-            sizeMetaData.put("skuId", skuId);
+        sizeMetaData = ProductMasterRestUtil.checkAndconvertParamsToCamelCase(params);
+        if(!sizeMetaData.containsKey("sizeCode")){
+        	throw new MissingParameterException("Request parameter should contain sizeCode");
         }
         return productMasterStagingService.saveSizeDataToProductMetadata(sizeMetaData, styleNumber,
                 colorNumber);
@@ -307,12 +240,7 @@ public class ProductMasterResource {
             @RequestParam(value = "include", required = false) String fieldsToDisplay)
                     throws Exception {
         LOG.info("StyleNumber : " + styleNumber + " Fields to include : " + fieldsToDisplay);
-
-        String[] fieldsToInclude = null;
-        if (StringUtils.isNotBlank(fieldsToDisplay)) {
-            fieldsToInclude = fieldsToDisplay.split(",");
-        }
-        return productMasterSearchservice.findProductByStyle(styleNumber, fieldsToInclude);
+        return productMasterSearchservice.findProductByStyle(styleNumber, fieldsToDisplay);
     }
 
     /**
