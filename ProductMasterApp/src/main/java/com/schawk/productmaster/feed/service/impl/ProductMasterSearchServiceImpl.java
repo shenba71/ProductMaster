@@ -30,19 +30,18 @@ public class ProductMasterSearchServiceImpl implements ProductMasterSearchServic
     private ProductMasterFeedDao productMasterFeedDao;
 
     @Override
-    public String findProductByStyleAndColor(String styleNumber, String colorCode)
-            throws Exception {
+    public String findProductByStyleAndColor(String styleNumber, String colorCode) throws Exception {
         return productMasterFeedDao.findProductByStyleAndColor(styleNumber, colorCode);
     }
 
     @Override
     public String findProductByStyle(String styleNumber, String field) throws Exception {
-    	List<String> fieldsToInclude = null;
+        List<String> fieldsToInclude = null;
         if (StringUtils.isNotBlank(field)) {
             for (String string : field.split(",")) {
-            	fieldsToInclude.add(StringUtil.getCamelCase(string));
-			}
-            
+                fieldsToInclude.add(StringUtil.getCamelCase(string));
+            }
+
         }
 
         return productMasterFeedDao.findProductByStyle(styleNumber, fieldsToInclude);
@@ -73,10 +72,10 @@ public class ProductMasterSearchServiceImpl implements ProductMasterSearchServic
         List<String> columnsToInclude = null;
         // check if include fields are present
         if (StringUtils.isNotBlank(fieldsToInclude)) {
-        	 for (String string : fieldsToInclude.split(",")) {
-        		 columnsToInclude.add(StringUtil.getCamelCase(string));
- 			}
-                    }
+            for (String string : fieldsToInclude.split(",")) {
+                columnsToInclude.add(StringUtil.getCamelCase(string));
+            }
+        }
 
         //If the provided input simply contains colorCode/sizeCode then append appropriate column hierarchy based on DB
         if (COLOR_CODE.equalsIgnoreCase(columnName)) {
@@ -85,8 +84,9 @@ public class ProductMasterSearchServiceImpl implements ProductMasterSearchServic
             columnName = SIZE_CODE_PREFIX.concat(columnName);
         }
 
-        if(StringUtils.isNotBlank(columnName) && columnValues != null) {
-        	response = productMasterFeedDao.findProductByFields(columnName, columnValues, columnsToInclude);
+        if (StringUtils.isNotBlank(columnName) && columnValues != null) {
+            response = productMasterFeedDao.findProductByFields(columnName, columnValues,
+                    columnsToInclude);
         }
         return response;
     }
@@ -96,9 +96,9 @@ public class ProductMasterSearchServiceImpl implements ProductMasterSearchServic
         List<String> columnsToInclude = null;
         // check if include fields are present
         if (StringUtils.isNotBlank(fieldsToInclude)) {
-        	 for (String string : fieldsToInclude.split(",")) {
-        		 columnsToInclude.add(StringUtil.getCamelCase(string));
- 			}
+            for (String string : fieldsToInclude.split(",")) {
+                columnsToInclude.add(StringUtil.getCamelCase(string));
+            }
         }
         return productMasterFeedDao.globalSearch(searchField, columnsToInclude);
     }

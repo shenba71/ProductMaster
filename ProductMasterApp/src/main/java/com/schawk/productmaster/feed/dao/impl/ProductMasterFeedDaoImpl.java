@@ -75,8 +75,9 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
                 // get a bulkWriteRequestBuilder by issuing find on the
                 // ProductStyle and Product color
 
-                BulkWriteRequestBuilder bulkWriteRequestBuilder = bulkWriteOperation.find(
-                        new BasicDBObject("Product style", product).append("Product color", color));
+                BulkWriteRequestBuilder bulkWriteRequestBuilder = bulkWriteOperation
+                        .find(new BasicDBObject("Product style", product).append("Product color",
+                                color));
 
                 // get hold of upsert operation from bulkWriteRequestBuilder
 
@@ -168,8 +169,8 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         String sizeCode = getValueFromJson(sizeMetaData, "sizeCode");
         DBObject obj = (DBObject) JSON.parse(sizeMetaData);
         BasicDBObject sizeMetaDataObject = new BasicDBObject("size", obj);
-        BasicDBObject queryObject = new BasicDBObject("styleNumber", styleNumber)
-                .append("colors.color.colorCode", colorNumber);
+        BasicDBObject queryObject = new BasicDBObject("styleNumber", styleNumber).append(
+                "colors.color.colorCode", colorNumber);
         BasicDBObject sizeObject = new BasicDBObject("colors.$.color.sizes", sizeMetaDataObject);
         // If style and color record was not already present, then wil create
         // style and color record before inserting size metadata
@@ -198,8 +199,8 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
             throws Exception {
         DBCollection collection = mongoTemplate.getDb().getCollection(COLLECTION_NAME);
         DBObject obj = (DBObject) JSON.parse(colorMetaData);
-        BasicDBObject queryObject = new BasicDBObject("styleNumber", styleNumber)
-                .append("colors.color.colorCode", colorNumber);
+        BasicDBObject queryObject = new BasicDBObject("styleNumber", styleNumber).append(
+                "colors.color.colorCode", colorNumber);
         BasicDBObject colorObject = new BasicDBObject("$set", obj);
         collection.update(queryObject, colorObject, true, false);
         return findProductByStyle(styleNumber, null);
@@ -212,8 +213,8 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         DBCollection collection = mongoTemplate.getDb().getCollection(COLLECTION_NAME);
         DBObject obj = (DBObject) JSON.parse(sizeMetaData);
 
-        BasicDBObject queryObject = new BasicDBObject("styleNumber", styleNumber)
-                .append("colors.color.colorCode", colorNumber);
+        BasicDBObject queryObject = new BasicDBObject("styleNumber", styleNumber).append(
+                "colors.color.colorCode", colorNumber);
         BasicDBObject colorObject = new BasicDBObject("$set", obj);
         WriteResult res = collection.update(queryObject, colorObject, true, false);
         return res.toString();
@@ -268,8 +269,8 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         LOG.info("Search for style numbers and color");
         String results = "";
         Query query = new Query();
-        query.addCriteria(
-                Criteria.where(PRODUCT_STYLE).is(styleNumber).and(PRODUCT_COLOR).is(colorNumber));
+        query.addCriteria(Criteria.where(PRODUCT_STYLE).is(styleNumber).and(PRODUCT_COLOR)
+                .is(colorNumber));
 
         // columns which are included would be displayed
         query.fields().include("catagory").include("styleNumber").include("gender")
@@ -372,8 +373,8 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         // Passes the documents with only the specified fields
         list.add(Aggregation.project("_id", "styleNumber", "colors"));
         Aggregation aggregate = Aggregation.newAggregation(list);
-        List<String> searchResults = mongoTemplate
-                .aggregate(aggregate, COLLECTION_NAME, String.class).getMappedResults();
+        List<String> searchResults = mongoTemplate.aggregate(aggregate, COLLECTION_NAME,
+                String.class).getMappedResults();
 
         if (CollectionUtils.isEmpty(searchResults) == false) {
             searchResult = searchResults.get(0).toString();
@@ -404,8 +405,8 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         // Passes the documents with only the specified fields
         list.add(Aggregation.project("_id", "styleNumber", "colors"));
         Aggregation aggregate = Aggregation.newAggregation(list);
-        List<String> searchResults = mongoTemplate
-                .aggregate(aggregate, COLLECTION_NAME, String.class).getMappedResults();
+        List<String> searchResults = mongoTemplate.aggregate(aggregate, COLLECTION_NAME,
+                String.class).getMappedResults();
         if (CollectionUtils.isEmpty(searchResults) == false) {
             searchResult = searchResults.get(0).toString();
         }

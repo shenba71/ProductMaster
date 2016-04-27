@@ -1,23 +1,18 @@
 package com.schawk.productmaster.feed.service.impl;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.schawk.productmaster.feed.dao.ProductMasterFeedDao;
 import com.schawk.productmaster.feed.service.ProductMasterStagingService;
-import com.schawk.productmaster.util.StringUtil;
-import com.schawk.productmaster.web.rest.errors.MissingParameterException;
 
 /**
  * @author shenbagaganesh.param
@@ -28,8 +23,7 @@ public class ProductMasterStagingServiceImpl implements ProductMasterStagingServ
 
     @Autowired
     private ProductMasterFeedDao productMasterFeedDao;
-    
-    
+
     private static final Logger LOG = LoggerFactory
             .getLogger(ProductMasterStagingServiceImpl.class);
 
@@ -54,8 +48,7 @@ public class ProductMasterStagingServiceImpl implements ProductMasterStagingServ
     }
 
     @Override
-    public String updateStyleDataToProductMetaData(Map<String, String> productMap)
-            throws Exception {
+    public String updateStyleDataToProductMetaData(Map<String, String> productMap) throws Exception {
         String productInputJson = convertMapToJson(productMap);
         LOG.debug("Request in JSON format.." + productInputJson);
         return productMasterFeedDao.updateProductMetaDataStyle(productInputJson);
@@ -138,8 +131,8 @@ public class ProductMasterStagingServiceImpl implements ProductMasterStagingServ
     }
 
     @Override
-    public String updateColorDataToProductMetadata(Map<String, String> valueMap, String styleNumber,
-            String colorNumber) throws Exception {
+    public String updateColorDataToProductMetadata(Map<String, String> valueMap,
+            String styleNumber, String colorNumber) throws Exception {
         String type = "color";
         String response = null;
         String updatedColorData = null;
@@ -184,8 +177,5 @@ public class ProductMasterStagingServiceImpl implements ProductMasterStagingServ
 
         return response;
     }
-
-	
-	
 
 }

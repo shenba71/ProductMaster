@@ -66,8 +66,8 @@ public interface ProductMasterStagingService {
      *recieves the updated color datas as map and converts it to
      *json and pass it to DAO
      */
-    public String updateColorDataToProductMetadata(Map<String, String> valueMap, String styleNumber,
-            String colorNumber) throws Exception;
+    public String updateColorDataToProductMetadata(Map<String, String> valueMap,
+            String styleNumber, String colorNumber) throws Exception;
 
     /**
      * @param valueMap
@@ -115,5 +115,5 @@ public interface ProductMasterStagingService {
      *json and pass it to DAO
      */
     public String updateStyleDataToProductMetaData(Map<String, String> productMap) throws Exception;
-    
-    }
+
+}
