@@ -93,6 +93,27 @@ public class ExceptionTranslator {
 
 	}
 	
+	@ExceptionHandler(InvalidParameterException.class)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorDTO invalidParameterException(InvalidParameterException exception) {
+		String errorMessage;
+
+		errorMessage = "";
+					
+		return new ErrorDTO(errorMessage);
+
+	}
+	
+	@ExceptionHandler(ResourceNotFoundException.class)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public ErrorDTO resourceNotFoundException(ResourceNotFoundException exception) {
+							
+		return new ErrorDTO(exception.getMessage());
+
+	}
+	
 	@ExceptionHandler(MissingParameterException.class)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.EXPECTATION_FAILED)

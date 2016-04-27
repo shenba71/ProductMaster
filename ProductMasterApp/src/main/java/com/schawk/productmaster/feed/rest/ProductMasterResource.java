@@ -251,23 +251,20 @@ public class ProductMasterResource {
     @RequestMapping(value = "/styles", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("search and retrieves the list of products that matches the search criteria")
     public String findProductByFields(
-            @RequestParam(value = "q", required = false) String globalSearchFields,
+            @RequestParam(value = "q", required = true) String globalSearchFields,
             @RequestParam(value = "include", required = false) String fieldsToInclude)
-            throws Exception {
-        String response = "";
+                    throws Exception {
         LOG.info("Query field : " + globalSearchFields + " Fields to include : " + fieldsToInclude);
-
+        
         if (StringUtils.isNotBlank(globalSearchFields)) {
-            if (globalSearchFields.startsWith("{")) {
-                response = productMasterSearchservice.findProductByFields(globalSearchFields,
-                        fieldsToInclude);
-            } else {
-                // global search is case insensitive
-                response = productMasterSearchservice.globalSearch(globalSearchFields,
-                        fieldsToInclude);
-            }
+        	       	
+        	String isSearchFieldPresent = String.valueOf(globalSearchFields.startsWith("{") && globalSearchFields.endsWith("}"));
+        	return productMasterSearchservice.findProducts(globalSearchFields, fieldsToInclude, isSearchFieldPresent);		  
+        	
+        } else {
+        	throw new InvalidParameterException();
         }
-        return response;
+                    
     }
 
     /**

@@ -68,4 +68,14 @@ public interface ProductMasterSearchService {
     public String findProductSizesByStyleAndColor(String styleNumber, String colorCode)
             throws Exception;
 
+	/**
+     * Search for products based on parameters
+     * @param globalSearchFields
+     * @param fieldsToInclude
+     * @param isSearchFieldPresent 
+     * @return
+     * @throws Exception
+     */
+	public String findProducts(String globalSearchFields, String fieldsToInclude, String isSearchFieldPresent) throws Exception;	
+
 }

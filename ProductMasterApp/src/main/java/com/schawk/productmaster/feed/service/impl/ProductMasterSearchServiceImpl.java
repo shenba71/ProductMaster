@@ -114,4 +114,22 @@ public class ProductMasterSearchServiceImpl implements ProductMasterSearchServic
             throws Exception {
         return productMasterFeedDao.findProductSizesByStyleAndColor(styleNumber, colorCode);
     }
+	
+	@Override
+    public String findProducts(String globalSearchFields, String fieldsToInclude, String isSearchFieldPresent) throws Exception{    	
+    	String response = "";    	
+    	if (StringUtils.isNotBlank(globalSearchFields)) {
+        	        	
+        	switch(isSearchFieldPresent) {
+        	case "true" : 
+        		response = findProductByFields(globalSearchFields, fieldsToInclude);
+        		break;        
+        	default : 
+        		// global search is case insensitive
+                response = globalSearch(globalSearchFields, fieldsToInclude);
+                break;
+        	}            
+        }
+        return response;
+    }
 }

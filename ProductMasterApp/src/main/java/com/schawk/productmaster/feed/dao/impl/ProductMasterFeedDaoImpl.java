@@ -337,6 +337,8 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
 
         if (CollectionUtils.isEmpty(resultList) == false) {
             searchResult = resultList.toString();
+        } else {
+        	throw new ResourceNotFoundException();
         }
         return searchResult;
     }
