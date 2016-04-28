@@ -41,418 +41,493 @@ import com.schawk.productmaster.web.rest.errors.ResourceNotFoundException;
 @Repository
 public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
 
-    @Autowired
-    private MongoTemplate mongoTemplate;
+	@Autowired
+	private MongoTemplate mongoTemplate;
 
-    private static final Logger LOG = LoggerFactory.getLogger(ProductMasterFeedDaoImpl.class);
+	private static final Logger LOG = LoggerFactory
+			.getLogger(ProductMasterFeedDaoImpl.class);
 
-    private static final String COLLECTION_NAME = "product_master";
-    private static final String PRODUCT_STYLE = "styleNumber";
-    private static final String PRODUCT_COLOR = "colors.color.colorCode";
-    private static final String PRODUCT_SIZE = "colors.color.sizes.size.sizeCode";
+	private static final String COLLECTION_NAME = "product_master";
+	private static final String PRODUCT_STYLE = "styleNumber";
+	private static final String PRODUCT_COLOR = "colors.color.colorCode";
+	private static final String PRODUCT_SIZE = "colors.color.sizes.size.sizeCode";
 
-    /* private MongoTemplate mongoTemplate; */
+	/* private MongoTemplate mongoTemplate; */
 
-    @Override
-    public String saveInputFeed(JSONArray inputFeed) {
-        String response = null;
-        try {
-            DBCollection collection = mongoTemplate.getDb().getCollection(COLLECTION_NAME);
+	@Override
+	public String saveInputFeed(JSONArray inputFeed) {
+		String response = null;
+		try {
+			DBCollection collection = mongoTemplate.getDb().getCollection(
+					COLLECTION_NAME);
 
-            // Get BulkWriteOperation by accessing the mongodb
+			// Get BulkWriteOperation by accessing the mongodb
 
-            BulkWriteOperation bulkWriteOperation = collection.initializeUnorderedBulkOperation();
+			BulkWriteOperation bulkWriteOperation = collection
+					.initializeUnorderedBulkOperation();
 
-            // perform the upsert operation in the loop to add objects for bulk
-            // execution
-            for (int i = 0; i < inputFeed.length(); i++) {
+			// perform the upsert operation in the loop to add objects for bulk
+			// execution
+			for (int i = 0; i < inputFeed.length(); i++) {
 
-                String product = inputFeed.getJSONObject(i).getString("Product style");
-                String color = inputFeed.getJSONObject(i).getString("Product color");
-                DBObject obj = (DBObject) JSON.parse(inputFeed.getJSONObject(i).toString());
-                BasicDBObject object = new BasicDBObject();
-                object.append("$set", obj);
+				String product = inputFeed.getJSONObject(i).getString(
+						"Product style");
+				String color = inputFeed.getJSONObject(i).getString(
+						"Product color");
+				DBObject obj = (DBObject) JSON.parse(inputFeed.getJSONObject(i)
+						.toString());
+				BasicDBObject object = new BasicDBObject();
+				object.append("$set", obj);
 
-                // get a bulkWriteRequestBuilder by issuing find on the
-                // ProductStyle and Product color
+				// get a bulkWriteRequestBuilder by issuing find on the
+				// ProductStyle and Product color
 
-                BulkWriteRequestBuilder bulkWriteRequestBuilder = bulkWriteOperation
-                        .find(new BasicDBObject("Product style", product).append("Product color",
-                                color));
+				BulkWriteRequestBuilder bulkWriteRequestBuilder = bulkWriteOperation
+						.find(new BasicDBObject("Product style", product)
+								.append("Product color", color));
 
-                // get hold of upsert operation from bulkWriteRequestBuilder
+				// get hold of upsert operation from bulkWriteRequestBuilder
 
-                BulkUpdateRequestBuilder updateReq = bulkWriteRequestBuilder.upsert();
-                updateReq.update(object);
-            }
-            // execute bulk operation on mycol collection
-            LOG.debug("Started inserting the json Inputs");
-            BulkWriteResult result = bulkWriteOperation.execute();
-            LOG.debug("Number of inserted documents=====>" + result.getInsertedCount());
-            LOG.debug("Number of updated documents=====>" + result.getModifiedCount());
-            LOG.debug("Number of Matched documents=====>" + result.getMatchedCount());
-            LOG.debug("Number of Upserted documents=====>"
-                    + (result.getUpserts() == null ? 0 : result.getUpserts().size()));
-            LOG.debug("Completed insertion of inputs..");
-            response = "No Of Inserted Documents"
-                    + (result.getUpserts() == null ? 0 : result.getUpserts().size()) + "   "
-                    + "No Of Updated Documents" + result.getModifiedCount();
-        } catch (Exception e) {
-            e.printStackTrace();
-            response = "Insertion Failed" + e.getMessage();
-        }
+				BulkUpdateRequestBuilder updateReq = bulkWriteRequestBuilder
+						.upsert();
+				updateReq.update(object);
+			}
+			// execute bulk operation on mycol collection
+			LOG.debug("Started inserting the json Inputs");
+			BulkWriteResult result = bulkWriteOperation.execute();
+			LOG.debug("Number of inserted documents=====>"
+					+ result.getInsertedCount());
+			LOG.debug("Number of updated documents=====>"
+					+ result.getModifiedCount());
+			LOG.debug("Number of Matched documents=====>"
+					+ result.getMatchedCount());
+			LOG.debug("Number of Upserted documents=====>"
+					+ (result.getUpserts() == null ? 0 : result.getUpserts()
+							.size()));
+			LOG.debug("Completed insertion of inputs..");
+			response = "No Of Inserted Documents"
+					+ (result.getUpserts() == null ? 0 : result.getUpserts()
+							.size()) + "   " + "No Of Updated Documents"
+					+ result.getModifiedCount();
+		} catch (Exception e) {
+			e.printStackTrace();
+			response = "Insertion Failed" + e.getMessage();
+		}
 
-        return response;
-    }
+		return response;
+	}
 
-    @Override
-    public String saveProductMetaDataStyle(String productMetaData) throws Exception {
-        String response = null;
-        String styleNumber = null;
-        try {
-            LOG.debug("Inside saveProductMetaDataStyle");
-            styleNumber = getValueFromJson(productMetaData, PRODUCT_STYLE);
-            DBCollection collection = mongoTemplate.getDb().getCollection(COLLECTION_NAME);
-            DBObject styleObject = (DBObject) JSON.parse(productMetaData);
-            collection.insert(styleObject);
-            response = findProductByStyle(styleNumber, null);
-            LOG.debug("Response==" + response);
-        } catch (MongoException mongoException) {
-            throw new CustomMongoException(styleNumber, mongoException.getCode(),
-                    mongoException.getMessage());
-        }
+	@Override
+	public String saveProductMetaDataStyle(String productMetaData)
+			throws Exception {
+		String response = null;
+		String styleNumber = null;
+		try {
+			LOG.debug("Inside saveProductMetaDataStyle");
+			styleNumber = getValueFromJson(productMetaData, PRODUCT_STYLE);
+			DBCollection collection = mongoTemplate.getDb().getCollection(
+					COLLECTION_NAME);
+			DBObject styleObject = (DBObject) JSON.parse(productMetaData);
+			collection.insert(styleObject);
+			response = findProductByStyle(styleNumber, null);
+			LOG.debug("Response==" + response);
+		} catch (MongoException mongoException) {
+			throw new CustomMongoException(styleNumber,
+					mongoException.getCode(), mongoException.getMessage());
+		}
 
-        return response;
+		return response;
 
-    }
+	}
 
-    @Override
-    public String updateProductMetaDataStyle(String productMetaData) throws Exception {
-        LOG.debug("Inside Update Style datas");
-        String styleNumber = getValueFromJson(productMetaData, PRODUCT_STYLE);
-        DBCollection collection = mongoTemplate.getDb().getCollection(COLLECTION_NAME);
-        DBObject productObject = (DBObject) JSON.parse(productMetaData);
-        BasicDBObject styleObject = new BasicDBObject("$set", productObject);
-        collection.update(new BasicDBObject("styleNumber", styleNumber), styleObject, true, false);
-        return findProductByStyle(styleNumber, null);
+	@Override
+	public String updateProductMetaDataStyle(String productMetaData)
+			throws Exception {
+		LOG.debug("Inside Update Style datas");
+		String styleNumber = getValueFromJson(productMetaData, PRODUCT_STYLE);
+		DBCollection collection = mongoTemplate.getDb().getCollection(
+				COLLECTION_NAME);
+		DBObject productObject = (DBObject) JSON.parse(productMetaData);
+		BasicDBObject styleObject = new BasicDBObject("$set", productObject);
+		collection.update(new BasicDBObject("styleNumber", styleNumber),
+				styleObject, true, false);
+		return findProductByStyle(styleNumber, null);
 
-    }
+	}
 
-    @Override
-    public String saveColorMetaData(String colorMetaData, String styleNumber) throws Exception {
-        String response = null;
-        LOG.debug("Inside save color Meta data values");
-        DBCollection collection = mongoTemplate.getDb().getCollection(COLLECTION_NAME);
-        String colorNumber = getValueFromJson(colorMetaData, "colorCode");
-        DBObject obj = (DBObject) JSON.parse(colorMetaData);
-        BasicDBObject colorMetaDataObject = new BasicDBObject("color", obj);
-        // forming query object for find operation
-        BasicDBObject styleObject = new BasicDBObject("styleNumber", styleNumber);
-        BasicDBObject colorObject = new BasicDBObject("colors", colorMetaDataObject);
-        BasicDBObject objectToInsert = new BasicDBObject();
-        objectToInsert.append("$addToSet", colorObject).append("$setOnInsert", styleObject);
-        // insertion will happen only if record not present for given color
-        try {
-            if (findProductByStyleAndColor(styleNumber, colorNumber).length() > 0) {
-                LOG.debug("Record already exists");
-                throw new CustomMongoException("Record already exists for given style "
-                        + styleNumber + "color" + colorNumber);
-            }
-            // the above method for find will throw ResourceNotFoundException if record not exists.
-            // In our scenario, insertion needs to be done only if the record not present. So we suppress the exception and perform insertion.
-        } catch (ResourceNotFoundException exception) {
-            LOG.error(exception.getMessage());
-            collection.update(styleObject, objectToInsert, true, false);
-            response = findProductByStyle(styleNumber, null);
-        }
-        return response;
-    }
+	@Override
+	public String saveColorMetaData(String colorMetaData, String styleNumber)
+			throws Exception {
+		String response = null;
+		LOG.debug("Inside save color Meta data values");
+		DBCollection collection = mongoTemplate.getDb().getCollection(
+				COLLECTION_NAME);
+		String colorNumber = getValueFromJson(colorMetaData, "colorCode");
+		DBObject obj = (DBObject) JSON.parse(colorMetaData);
+		BasicDBObject colorMetaDataObject = new BasicDBObject("color", obj);
+		// forming query object for find operation
+		BasicDBObject styleObject = new BasicDBObject("styleNumber",
+				styleNumber);
+		BasicDBObject colorObject = new BasicDBObject("colors",
+				colorMetaDataObject);
+		BasicDBObject objectToInsert = new BasicDBObject();
+		objectToInsert.append("$addToSet", colorObject).append("$setOnInsert",
+				styleObject);
+		// insertion will happen only if record not present for given color.
+		// In try block we are checking whether the given color is already
+		// present. If record present in db, then throw custom exception with
+		// message Record Exists.
+		// If record not present, then the method findProductByStyleAndColor
+		// throws ResourceNotFoundException, In catch block, we suppress this
+		// exception and inserts the record in DB.
+		try {
+			if (findProductByStyleAndColor(styleNumber, colorNumber).length() > 0) {
+				LOG.debug("Record already exists");
+				throw new CustomMongoException(
+						"Record already exists for given style " + styleNumber
+								+ "color" + colorNumber);
+			}
 
-    @Override
-    public String saveSizeMetaData(String sizeMetaData, String styleNumber, String colorNumber)
-            throws Exception {
-        String response = null;
-        LOG.debug("Save Size metedata values");
-        DBCollection collection = mongoTemplate.getDb().getCollection(COLLECTION_NAME);
-        String sizeCode = getValueFromJson(sizeMetaData, "sizeCode");
-        DBObject obj = (DBObject) JSON.parse(sizeMetaData);
-        BasicDBObject sizeMetaDataObject = new BasicDBObject("size", obj);
-        BasicDBObject queryObject = new BasicDBObject("styleNumber", styleNumber).append(
-                "colors.color.colorCode", colorNumber);
-        BasicDBObject sizeObject = new BasicDBObject("colors.$.color.sizes", sizeMetaDataObject);
-        // If style and color record was not already present, then wil create
-        // style and color record before inserting size metadata
-        try {
-            if (findProductByStyleAndColor(styleNumber, colorNumber).length() > 0) {
-                LOG.debug("Style record exists for given values.");
-            }
-            // the above method for find will throw ResourceNotFoundException if record not exists.
-            // In our scenario, insertion needs to be done only if the record not present. So we suppress the exception and perform insertion.
-        } catch (ResourceNotFoundException ex) {
-            LOG.debug("Style record not exists for given value");
-            BasicDBObject colorObject = new BasicDBObject("colorCode", colorNumber);
-            saveColorMetaData(colorObject.toString(), styleNumber);
-        }
-        BasicDBObject object = new BasicDBObject();
-        object.append("$addToSet", sizeObject);
-        // If a size record was not present, then allow to insert
-        try {
-            if (findProductByStyleColorAndSize(styleNumber, colorNumber, sizeCode).length() > 0) {
-                LOG.debug("Size Record already exists");
-                LOG.debug("Record already exists");
-                throw new CustomMongoException("Record already exists for given style "
-                        + styleNumber + "color" + colorNumber + "size " + sizeCode);
-            }
-            // the above method for find will throw ResourceNotFoundException if record not exists.
-            // In our scenario, insertion needs to be done only if the record not present. So we suppress the exception and perform insertion.
-        } catch (ResourceNotFoundException ex) {
-            LOG.debug("Size record not exists.." + ex.getMessage());
-            collection.update(queryObject, object, true, false);
-            response = findProductByStyle(styleNumber, null);
-        }
+		} catch (ResourceNotFoundException exception) {
+			// the above method for find will throw ResourceNotFoundException if
+			// record not exists.
+			// In our scenario, insertion needs to be done only if the record
+			// not present. So we suppress the exception and perform insertion.
+			LOG.error(exception.getMessage());
+			collection.update(styleObject, objectToInsert, true, false);
+			response = findProductByStyle(styleNumber, null);
+		}
+		return response;
+	}
 
-        return response;
+	@Override
+	public String saveSizeMetaData(String sizeMetaData, String styleNumber,
+			String colorNumber) throws Exception {
+		String response = null;
+		LOG.debug("Save Size metedata values");
+		DBCollection collection = mongoTemplate.getDb().getCollection(
+				COLLECTION_NAME);
+		String sizeCode = getValueFromJson(sizeMetaData, "sizeCode");
+		DBObject obj = (DBObject) JSON.parse(sizeMetaData);
+		BasicDBObject sizeMetaDataObject = new BasicDBObject("size", obj);
+		BasicDBObject queryObject = new BasicDBObject("styleNumber",
+				styleNumber).append("colors.color.colorCode", colorNumber);
+		BasicDBObject sizeObject = new BasicDBObject("colors.$.color.sizes",
+				sizeMetaDataObject);
+		// If style and color record was not already present, then will create
+		// style and color record before inserting size metadata
+		// If record already exists for style and color, then only the insertion
+		// of size is enough.
+		// So in try block, the find method will throw ResourceNotFoundException
+		// if record not exists, so in catch block, we supress this exception
+		// and inserts style and color record.
+		try {
+			if (findProductByStyleAndColor(styleNumber, colorNumber).length() > 0) {
+				LOG.debug("Style record exists for given values.");
+			}
 
-    }
+		} catch (ResourceNotFoundException ex) {
+			// the above method for find will throw ResourceNotFoundException if
+			// record not exists.
+			// In our scenario, insertion needs to be done only if the record
+			// not present. So we suppress the exception and perform insertion.
+			LOG.debug("Style record not exists for given value");
+			BasicDBObject colorObject = new BasicDBObject("colorCode",
+					colorNumber);
+			saveColorMetaData(colorObject.toString(), styleNumber);
+		}
+		BasicDBObject object = new BasicDBObject();
+		object.append("$addToSet", sizeObject);
+		// insertion will happen only if record not present for given size.
+		// In try block we are checking whether the given size is already
+		// present. If record present in db, then throw custom exception with
+		// message Record Exists.
+		// If record not present, then the method findProductByStyleColorAndSize
+		// throws ResourceNotFoundException, In catch block, we suppress this
+		// exception and inserts the record in DB.
+		try {
+			if (findProductByStyleColorAndSize(styleNumber, colorNumber,
+					sizeCode).length() > 0) {
+				LOG.debug("Size Record already exists");
+				LOG.debug("Record already exists");
+				throw new CustomMongoException(
+						"Record already exists for given style " + styleNumber
+								+ "color" + colorNumber + "size " + sizeCode);
+			}
 
-    @Override
-    public String updateColorMetaData(String colorMetaData, String styleNumber, String colorNumber)
-            throws Exception {
-        DBCollection collection = mongoTemplate.getDb().getCollection(COLLECTION_NAME);
-        DBObject obj = (DBObject) JSON.parse(colorMetaData);
-        BasicDBObject queryObject = new BasicDBObject("styleNumber", styleNumber).append(
-                "colors.color.colorCode", colorNumber);
-        BasicDBObject colorObject = new BasicDBObject("$set", obj);
-        collection.update(queryObject, colorObject, true, false);
-        return findProductByStyle(styleNumber, null);
+		} catch (ResourceNotFoundException ex) {
+			// the above method for find will throw ResourceNotFoundException if
+			// size record not exists.
+			// In our scenario, insertion needs to be done only if the record
+			// not present. So we suppress the exception and perform insertion.
+			LOG.debug("Size record not exists.." + ex.getMessage());
+			collection.update(queryObject, object, true, false);
+			response = findProductByStyle(styleNumber, null);
+		}
 
-    }
+		return response;
 
-    @Override
-    public String updateSizeMetaData(String sizeMetaData, String styleNumber, String colorNumber,
-            String sizeCode) throws Exception {
-        DBCollection collection = mongoTemplate.getDb().getCollection(COLLECTION_NAME);
-        DBObject obj = (DBObject) JSON.parse(sizeMetaData);
+	}
 
-        BasicDBObject queryObject = new BasicDBObject("styleNumber", styleNumber).append(
-                "colors.color.colorCode", colorNumber);
-        BasicDBObject colorObject = new BasicDBObject("$set", obj);
-        WriteResult res = collection.update(queryObject, colorObject, true, false);
-        return res.toString();
+	@Override
+	public String updateColorMetaData(String colorMetaData, String styleNumber,
+			String colorNumber) throws Exception {
+		DBCollection collection = mongoTemplate.getDb().getCollection(
+				COLLECTION_NAME);
+		DBObject obj = (DBObject) JSON.parse(colorMetaData);
+		BasicDBObject queryObject = new BasicDBObject("styleNumber",
+				styleNumber).append("colors.color.colorCode", colorNumber);
+		BasicDBObject colorObject = new BasicDBObject("$set", obj);
+		collection.update(queryObject, colorObject, true, false);
+		return findProductByStyle(styleNumber, null);
 
-    }
+	}
 
-    @Override
-    public int getIndexForSize(String styleNumber, String colorCode, String sizeCode)
-            throws Exception {
-        String result = findProductByStyleAndColor(styleNumber, colorCode);
-        JSONObject productJson = new JSONObject(result);
-        JSONArray sizeArray = productJson.getJSONArray("colors").getJSONObject(0)
-                .getJSONObject("color").getJSONArray("sizes");
-        int position = 0;
-        for (int i = 0; i < sizeArray.length(); i++) {
-            JSONObject objects = sizeArray.getJSONObject(i);
-            if (objects.getJSONObject("size").getString("sizeCode").equalsIgnoreCase(sizeCode)) {
-                position = i;
-            }
+	@Override
+	public String updateSizeMetaData(String sizeMetaData, String styleNumber,
+			String colorNumber, String sizeCode) throws Exception {
+		DBCollection collection = mongoTemplate.getDb().getCollection(
+				COLLECTION_NAME);
+		DBObject obj = (DBObject) JSON.parse(sizeMetaData);
 
-        }
-        return position;
+		BasicDBObject queryObject = new BasicDBObject("styleNumber",
+				styleNumber).append("colors.color.colorCode", colorNumber);
+		BasicDBObject colorObject = new BasicDBObject("$set", obj);
+		WriteResult res = collection.update(queryObject, colorObject, true,
+				false);
+		return res.toString();
 
-    }
+	}
 
-    @Override
-    public String findProductByFields(String columnName, String[] columnValues,
-            List<String> columnsToInclude) throws Exception {
-        LOG.info("Search for multiple style numbers and display specified columns");
-        String results = "";
-        Query query = new Query();
-        query.addCriteria(Criteria.where(columnName).in(columnValues));
+	@Override
+	public int getIndexForSize(String styleNumber, String colorCode,
+			String sizeCode) throws Exception {
+		String result = findProductByStyleAndColor(styleNumber, colorCode);
+		JSONObject productJson = new JSONObject(result);
+		JSONArray sizeArray = productJson.getJSONArray("colors")
+				.getJSONObject(0).getJSONObject("color").getJSONArray("sizes");
+		int position = 0;
+		for (int i = 0; i < sizeArray.length(); i++) {
+			JSONObject objects = sizeArray.getJSONObject(i);
+			if (objects.getJSONObject("size").getString("sizeCode")
+					.equalsIgnoreCase(sizeCode)) {
+				position = i;
+			}
 
-        // columns which are included would be displayed
-        if (columnsToInclude != null) {
-            for (String FieldName : columnsToInclude) {
-                query.fields().include(FieldName);
-            }
-        }
-        LOG.debug("Query : " + query);
-        List<String> searchResults = mongoTemplate.find(query, String.class, COLLECTION_NAME);
+		}
+		return position;
 
-        if (CollectionUtils.isEmpty(searchResults) == false) {
-            results = searchResults.toString();
-        } else {
-            throw new ResourceNotFoundException("No Results Found for coloumn " + columnName);
-        }
-        return results;
-    }
+	}
 
-    @Override
-    public String findProductByStyleAndColor(String styleNumber, String colorNumber)
-            throws Exception {
-        LOG.info("Search for style numbers and color");
-        String results = "";
-        Query query = new Query();
-        query.addCriteria(Criteria.where(PRODUCT_STYLE).is(styleNumber).and(PRODUCT_COLOR)
-                .is(colorNumber));
+	@Override
+	public String findProductByFields(String columnName, String[] columnValues,
+			List<String> columnsToInclude) throws Exception {
+		LOG.info("Search for multiple style numbers and display specified columns");
+		String results = "";
+		Query query = new Query();
+		query.addCriteria(Criteria.where(columnName).in(columnValues));
 
-        // columns which are included would be displayed
-        query.fields().include("catagory").include("styleNumber").include("gender")
-                .include("productName").include("productType").include("colors.$");
+		// columns which are included would be displayed
+		if (columnsToInclude != null) {
+			for (String FieldName : columnsToInclude) {
+				query.fields().include(FieldName);
+			}
+		}
+		LOG.debug("Query : " + query);
+		List<String> searchResults = mongoTemplate.find(query, String.class,
+				COLLECTION_NAME);
 
-        // uncomment below line to get color without sizes and comment the above
-        // line
-        // query.fields().exclude("colors.color.sizes");
-        LOG.debug("Query : " + query);
+		if (CollectionUtils.isEmpty(searchResults) == false) {
+			results = searchResults.toString();
+		} else {
+			throw new ResourceNotFoundException("No Results Found for coloumn "
+					+ columnName);
+		}
+		return results;
+	}
 
-        String searchResult = mongoTemplate.findOne(query, String.class, COLLECTION_NAME);
-        if (StringUtils.isEmpty(searchResult) == false) {
-            results = searchResult.toString();
-        } else {
-            throw new ResourceNotFoundException("No results found for given style " + styleNumber
-                    + "and color" + colorNumber);
-        }
-        return results;
-    }
+	@Override
+	public String findProductByStyleAndColor(String styleNumber,
+			String colorNumber) throws Exception {
+		LOG.info("Search for style numbers and color");
+		String results = "";
+		Query query = new Query();
+		query.addCriteria(Criteria.where(PRODUCT_STYLE).is(styleNumber)
+				.and(PRODUCT_COLOR).is(colorNumber));
 
-    @Override
-    public String findProductByStyle(String styleNumber, List<String> field) throws Exception {
-        LOG.info("Search for style numbers");
-        String results = "";
-        Query query = new Query();
-        query.addCriteria(Criteria.where(PRODUCT_STYLE).is(styleNumber));
+		// columns which are included would be displayed
+		query.fields().include("catagory").include("styleNumber")
+				.include("gender").include("productName")
+				.include("productType").include("colors.$");
 
-        // columns which are included would be displayed
-        if (field != null) {
-            for (String key : field) {
-                query.fields().include(key);
-            }
-        }
-        LOG.debug("Query : " + query);
+		// uncomment below line to get color without sizes and comment the above
+		// line
+		// query.fields().exclude("colors.color.sizes");
+		LOG.debug("Query : " + query);
 
-        String searchResult = mongoTemplate.findOne(query, String.class, COLLECTION_NAME);
-        if (StringUtils.isEmpty(searchResult) == false) {
-            results = searchResult.toString();
-        } else {
-            throw new ResourceNotFoundException("No results found for given style " + styleNumber);
-        }
-        return results;
-    }
+		String searchResult = mongoTemplate.findOne(query, String.class,
+				COLLECTION_NAME);
+		if (StringUtils.isEmpty(searchResult) == false) {
+			results = searchResult.toString();
+		} else {
+			throw new ResourceNotFoundException(
+					"No results found for given style " + styleNumber
+							+ "and color" + colorNumber);
+		}
+		return results;
+	}
 
-    @Override
-    public String globalSearch(String searchField, List<String> columnsToInclude) throws Exception {
-        LOG.info("Inside globalSearch method");
-        String searchResult = "";
-        List<String> resultList = new ArrayList<String>();
-        DBCollection collection = mongoTemplate.getDb().getCollection(COLLECTION_NAME);
-        DBObject searchQuery = QueryBuilder.start().text(searchField).get();
+	@Override
+	public String findProductByStyle(String styleNumber, List<String> field)
+			throws Exception {
+		LOG.info("Search for style numbers");
+		String results = "";
+		Query query = new Query();
+		query.addCriteria(Criteria.where(PRODUCT_STYLE).is(styleNumber));
 
-        BasicDBObject fieldsToInclude = new BasicDBObject();
-        // columns which are included would be displayed
-        if (columnsToInclude != null) {
-            for (String FieldName : columnsToInclude) {
-                fieldsToInclude.put(FieldName, 1);
-            }
-        }
+		// columns which are included would be displayed
+		if (field != null) {
+			for (String key : field) {
+				query.fields().include(key);
+			}
+		}
+		LOG.debug("Query : " + query);
 
-        DBCursor productCursor = collection.find(searchQuery, fieldsToInclude);
+		String searchResult = mongoTemplate.findOne(query, String.class,
+				COLLECTION_NAME);
+		if (StringUtils.isEmpty(searchResult) == false) {
+			results = searchResult.toString();
+		} else {
+			throw new ResourceNotFoundException(
+					"No results found for given style " + styleNumber);
+		}
+		return results;
+	}
 
-        while (productCursor.hasNext()) {
-            String resultString = productCursor.next().toString();
-            LOG.debug("Results :" + resultString);
-            resultList.add(resultString);
-            LOG.debug("Results size" + resultList.size());
-        }
+	@Override
+	public String globalSearch(String searchField, List<String> columnsToInclude)
+			throws Exception {
+		LOG.info("Inside globalSearch method");
+		String searchResult = "";
+		List<String> resultList = new ArrayList<String>();
+		DBCollection collection = mongoTemplate.getDb().getCollection(
+				COLLECTION_NAME);
+		DBObject searchQuery = QueryBuilder.start().text(searchField).get();
 
-        if (CollectionUtils.isEmpty(resultList) == false) {
-            searchResult = resultList.toString();
-        } else {
-            throw new ResourceNotFoundException("No Records found for given search criteria"
-                    + searchField);
-        }
-        return searchResult;
-    }
+		BasicDBObject fieldsToInclude = new BasicDBObject();
+		// columns which are included would be displayed
+		if (columnsToInclude != null) {
+			for (String FieldName : columnsToInclude) {
+				fieldsToInclude.put(FieldName, 1);
+			}
+		}
 
-    /**
-     * @param jsonInput
-     * @param keyValue
-     * @return the value of the given key in json string
-     * @throws JSONException
-     */
-    private String getValueFromJson(String jsonInput, String keyValue) throws JSONException {
-        JSONObject jsonObject = new JSONObject(jsonInput);
-        return jsonObject.getString(keyValue);
-    }
+		DBCursor productCursor = collection.find(searchQuery, fieldsToInclude);
 
-    @Override
-    public String findProductByStyleColorAndSize(String styleNumber, String colorCode,
-            String sizeCode) throws Exception {
-        LOG.info("Search for size by given style numbers, color and sizeCode");
-        String results = "";
-        String searchResult = null;
+		while (productCursor.hasNext()) {
+			String resultString = productCursor.next().toString();
+			LOG.debug("Results :" + resultString);
+			resultList.add(resultString);
+			LOG.debug("Results size" + resultList.size());
+		}
 
-        List<AggregationOperation> list = new ArrayList<AggregationOperation>();
-        // Deconstructs an array field from the input documents to output a
-        // document for each element
-        list.add(Aggregation.unwind("colors"));
-        list.add(Aggregation.unwind("colors.color.sizes"));
-        // Filters the documents to pass only the documents that match the
-        // specified condition
-        list.add(Aggregation.match(Criteria.where(PRODUCT_STYLE).is(styleNumber)));
-        list.add(Aggregation.match(Criteria.where(PRODUCT_COLOR).is(colorCode)));
-        list.add(Aggregation.match(Criteria.where(PRODUCT_SIZE).is(sizeCode)));
-        list.add(Aggregation.group("_id", "styleNumber").push("colors").as("colors"));
-        // Passes the documents with only the specified fields
-        list.add(Aggregation.project("_id", "styleNumber", "colors"));
-        Aggregation aggregate = Aggregation.newAggregation(list);
-        List<String> searchResults = mongoTemplate.aggregate(aggregate, COLLECTION_NAME,
-                String.class).getMappedResults();
+		if (CollectionUtils.isEmpty(resultList) == false) {
+			searchResult = resultList.toString();
+		} else {
+			throw new ResourceNotFoundException(
+					"No Records found for given search criteria" + searchField);
+		}
+		return searchResult;
+	}
 
-        if (CollectionUtils.isEmpty(searchResults) == false) {
-            searchResult = searchResults.get(0).toString();
-        }
+	/**
+	 * @param jsonInput
+	 * @param keyValue
+	 * @return the value of the given key in json string
+	 * @throws JSONException
+	 */
+	private String getValueFromJson(String jsonInput, String keyValue)
+			throws JSONException {
+		JSONObject jsonObject = new JSONObject(jsonInput);
+		return jsonObject.getString(keyValue);
+	}
 
-        LOG.debug("searchResult : " + searchResult);
-        if (StringUtils.isEmpty(searchResult) == false) {
-            results = searchResult;
-        } else {
-            throw new ResourceNotFoundException("No results found for given style " + styleNumber
-                    + "and color" + colorCode + "and size" + sizeCode);
-        }
-        return results;
-    }
+	@Override
+	public String findProductByStyleColorAndSize(String styleNumber,
+			String colorCode, String sizeCode) throws Exception {
+		LOG.info("Search for size by given style numbers, color and sizeCode");
+		String results = "";
+		String searchResult = null;
 
-    @Override
-    public String findProductSizesByStyleAndColor(String styleNumber, String colorCode)
-            throws Exception {
-        LOG.info("Search for all sizes of product using style numbers and color");
-        String results = "";
-        String searchResult = null;
-        List<AggregationOperation> list = new ArrayList<AggregationOperation>();
-        // Deconstructs an array field from the input documents to output a
-        // document for each element
-        list.add(Aggregation.unwind("colors"));
-        // Filters the documents to pass only the documents that match the
-        // specified condition
-        list.add(Aggregation.match(Criteria.where(PRODUCT_STYLE).is(styleNumber)));
-        list.add(Aggregation.match(Criteria.where(PRODUCT_COLOR).is(colorCode)));
-        list.add(Aggregation.group("_id", "styleNumber").push("colors").as("colors"));
-        // Passes the documents with only the specified fields
-        list.add(Aggregation.project("_id", "styleNumber", "colors"));
-        Aggregation aggregate = Aggregation.newAggregation(list);
-        List<String> searchResults = mongoTemplate.aggregate(aggregate, COLLECTION_NAME,
-                String.class).getMappedResults();
-        if (CollectionUtils.isEmpty(searchResults) == false) {
-            searchResult = searchResults.get(0).toString();
-        }
+		List<AggregationOperation> list = new ArrayList<AggregationOperation>();
+		// Deconstructs an array field from the input documents to output a
+		// document for each element
+		list.add(Aggregation.unwind("colors"));
+		list.add(Aggregation.unwind("colors.color.sizes"));
+		// Filters the documents to pass only the documents that match the
+		// specified condition
+		list.add(Aggregation.match(Criteria.where(PRODUCT_STYLE)
+				.is(styleNumber)));
+		list.add(Aggregation.match(Criteria.where(PRODUCT_COLOR).is(colorCode)));
+		list.add(Aggregation.match(Criteria.where(PRODUCT_SIZE).is(sizeCode)));
+		list.add(Aggregation.group("_id", "styleNumber").push("colors")
+				.as("colors"));
+		// Passes the documents with only the specified fields
+		list.add(Aggregation.project("_id", "styleNumber", "colors"));
+		Aggregation aggregate = Aggregation.newAggregation(list);
+		List<String> searchResults = mongoTemplate.aggregate(aggregate,
+				COLLECTION_NAME, String.class).getMappedResults();
 
-        LOG.debug("searchResult : " + searchResult);
-        if (StringUtils.isEmpty(searchResult) == false) {
-            results = searchResult.toString();
-        } else {
-            throw new ResourceNotFoundException("No size records found for given style "
-                    + styleNumber + "and color" + colorCode);
-        }
-        return results;
-    }
+		if (CollectionUtils.isEmpty(searchResults) == false) {
+			searchResult = searchResults.get(0).toString();
+		}
+
+		LOG.debug("searchResult : " + searchResult);
+		if (StringUtils.isEmpty(searchResult) == false) {
+			results = searchResult;
+		} else {
+			throw new ResourceNotFoundException(
+					"No results found for given style " + styleNumber
+							+ "and color" + colorCode + "and size" + sizeCode);
+		}
+		return results;
+	}
+
+	@Override
+	public String findProductSizesByStyleAndColor(String styleNumber,
+			String colorCode) throws Exception {
+		LOG.info("Search for all sizes of product using style numbers and color");
+		String results = "";
+		String searchResult = null;
+		List<AggregationOperation> list = new ArrayList<AggregationOperation>();
+		// Deconstructs an array field from the input documents to output a
+		// document for each element
+		list.add(Aggregation.unwind("colors"));
+		// Filters the documents to pass only the documents that match the
+		// specified condition
+		list.add(Aggregation.match(Criteria.where(PRODUCT_STYLE)
+				.is(styleNumber)));
+		list.add(Aggregation.match(Criteria.where(PRODUCT_COLOR).is(colorCode)));
+		list.add(Aggregation.group("_id", "styleNumber").push("colors")
+				.as("colors"));
+		// Passes the documents with only the specified fields
+		list.add(Aggregation.project("_id", "styleNumber", "colors"));
+		Aggregation aggregate = Aggregation.newAggregation(list);
+		List<String> searchResults = mongoTemplate.aggregate(aggregate,
+				COLLECTION_NAME, String.class).getMappedResults();
+		if (CollectionUtils.isEmpty(searchResults) == false) {
+			searchResult = searchResults.get(0).toString();
+		}
+
+		LOG.debug("searchResult : " + searchResult);
+		if (StringUtils.isEmpty(searchResult) == false) {
+			results = searchResult.toString();
+		} else {
+			throw new ResourceNotFoundException(
+					"No size records found for given style " + styleNumber
+							+ "and color" + colorCode);
+		}
+		return results;
+	}
 
 }
