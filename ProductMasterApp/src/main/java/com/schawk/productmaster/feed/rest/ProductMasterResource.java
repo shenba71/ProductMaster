@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mongodb.MongoException;
 import com.schawk.productmaster.feed.service.ProductMasterSearchService;
 import com.schawk.productmaster.feed.service.ProductMasterStagingService;
+import com.schawk.productmaster.util.StringUtil;
 import com.schawk.productmaster.web.rest.errors.InvalidParameterException;
 import com.schawk.productmaster.web.rest.errors.MissingParameterException;
 import com.schawk.productmaster.web.rest.util.ProductMasterRestUtil;
@@ -44,6 +45,8 @@ public class ProductMasterResource {
     private ProductMasterSearchService productMasterSearchservice;
 
     private static final Logger LOG = LoggerFactory.getLogger(ProductMasterResource.class);
+    private static final String CONSTANT_GLOBAL_SEARCH_REGEX = "([^{}]+)";
+    private static final String CONSTANT_SEARCH_IN_FIELD_REGEX = "\\{([^{}]+)\\}";
 
     /**
      * @param productJson
@@ -59,6 +62,8 @@ public class ProductMasterResource {
     }
 
     /**
+     * This method will recieve all the request parameters for style given in the request as a map and pass it to service layer for insertion.
+     * 
      * @param map of request parameters
      * @return the inserted document in mongodb as response
      * @throws Exception
@@ -79,9 +84,11 @@ public class ProductMasterResource {
     }
 
     /**
+     * This method will recieve all the request parameters for style given in the request as a map and pass it to service layer for updation.
+     * 
      * @param map of request parameters
      *            
-     * @return
+     * @return the updated record as response
      * @throws Exception
      */
     @RequestMapping(value = "/styles", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -100,9 +107,10 @@ public class ProductMasterResource {
     }
 
     /**
+     * This method will recieve all the request parameters for color given in the request as a map and pass it to service layer for insertion.
+     * 
      * @param styleNumber
-     * @param map
-     *            of request parameters
+     * @param map of request parameters
      * @return the inserted document in mongodb as response
      * @throws Exception
      */
@@ -122,6 +130,8 @@ public class ProductMasterResource {
     }
 
     /**
+     * This method will recieve all the request parameters for color given in the request as a map and pass it to service layer for insertion.
+     * 
      * @param styleNumber
      * @param colorMetaDataJson
      * @return the inserted document in mongodb as response
@@ -138,10 +148,11 @@ public class ProductMasterResource {
     }
 
     /**
+     * This method will recieve all the request parameters for color given in the request as a map and pass it to service layer for updation.
+     * 
      * @param styleNumber
      * @param colorNumber
-     * @param map
-     *            of request parameters
+     * @param map of request parameters
      * @return the updated document as response
      * @throws Exception
      */
@@ -159,11 +170,12 @@ public class ProductMasterResource {
     }
 
     /**
+     * This method will recieve all the request parameters for size given in the request as a map and pass it to service layer for updation.
+     * 
      * @param styleNumber
      * @param colorNumber
      * @param sizeCode
-     * @param map
-     *            of request parameters
+     * @param map of request parameters
      * @return the updated document as response
      * @throws Exception
      */
@@ -183,10 +195,11 @@ public class ProductMasterResource {
     }
 
     /**
+     * This method will recieve all the request parameters for size given in the request as a map and pass it to service layer for insertion.
+     * 
      * @param styleNumber
      * @param colorNumber
-     * @param map
-     *            of request parameters
+     * @param map of request parameters
      * @return the inserted document as response
      * @throws Exception
      */
@@ -245,11 +258,11 @@ public class ProductMasterResource {
     }
 
     /**
-     * This is a q search which can be used by two ways a) Refind search for
-     * specified fields Example Input :
-     * /styles?q={styleNumber=12345,12346}&include=styleNumber,colors b) Global
-     * search for specified fields which are mentioned in text indexes Example
-     * Input : /styles?q=FOOTWEAR
+     * This is a q search which can be used by two ways 
+     * a) Refined search for specified fields 
+     * Example Input : /styles?q={styleNumber=12345,12346}&include=styleNumber,colors 
+     * b) Global search for specified fields which are mentioned in text indexes 
+     * Example: Input : /styles?q=FOOTWEAR
      * 
      * @param globalSearchFields
      * @param fieldsToInclude
@@ -264,16 +277,23 @@ public class ProductMasterResource {
             throws Exception {
         LOG.info("Query field : " + globalSearchFields + " Fields to include : " + fieldsToInclude);
 
-        if (StringUtils.isNotBlank(globalSearchFields)) {
-
-            String isSearchFieldPresent = String.valueOf(globalSearchFields.startsWith("{")
-                    && globalSearchFields.endsWith("}"));
-            return productMasterSearchservice.findProducts(globalSearchFields, fieldsToInclude,
-                    isSearchFieldPresent);
-
-        } else {
-            throw new InvalidParameterException("Invalid parameter for search " + globalSearchFields);
+        if (StringUtils.isBlank(globalSearchFields)) {
+            throw new MissingParameterException("q parameter value not provided "
+                    + globalSearchFields);
         }
+        Map<String, String> regexMap = new HashMap<String, String>();
+        regexMap.put("globalSearch", CONSTANT_GLOBAL_SEARCH_REGEX);
+        regexMap.put("searchInFields", CONSTANT_SEARCH_IN_FIELD_REGEX);
+
+        String validSearchString = StringUtil.validateFieldWithRegex(globalSearchFields, regexMap);
+
+        if (StringUtils.isBlank(validSearchString) == true) {
+            throw new InvalidParameterException("Invalid parameter specified for search "
+                    + globalSearchFields);
+        }
+
+        return productMasterSearchservice.findProducts(globalSearchFields, fieldsToInclude,
+                validSearchString);
 
     }
 

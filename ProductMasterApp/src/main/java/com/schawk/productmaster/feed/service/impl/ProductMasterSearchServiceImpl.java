@@ -120,20 +120,25 @@ public class ProductMasterSearchServiceImpl implements ProductMasterSearchServic
 
     @Override
     public String findProducts(String globalSearchFields, String fieldsToInclude,
-            String isSearchFieldPresent) throws Exception {
+            String searchString) throws Exception {
         String response = "";
         if (StringUtils.isNotBlank(globalSearchFields)) {
 
-            switch (isSearchFieldPresent) {
-            case "true":
+            switch (searchString) {
+            case "searchInFields":
                 response = findProductByFields(globalSearchFields, fieldsToInclude);
                 break;
-            default:
+            case "globalSearch":
                 // global search is case insensitive
                 response = globalSearch(globalSearchFields, fieldsToInclude);
                 break;
+            default:
+                response = globalSearch(globalSearchFields, fieldsToInclude);
+                break;
             }
+
         }
         return response;
     }
+
 }

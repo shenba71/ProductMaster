@@ -413,8 +413,7 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
     public String findProductByStyleColorAndSize(String styleNumber, String colorCode,
             String sizeCode) throws Exception {
         LOG.info("Search for size by given style numbers, color and sizeCode");
-        String results = "";
-        String searchResult = null;
+        String searchResult = "";
 
         List<AggregationOperation> list = new ArrayList<AggregationOperation>();
         // Deconstructs an array field from the input documents to output a
@@ -438,21 +437,18 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         }
 
         LOG.debug("searchResult : " + searchResult);
-        if (StringUtils.isEmpty(searchResult) == false) {
-            results = searchResult;
-        } else {
+        if (StringUtils.isEmpty(searchResult)) {
             throw new ResourceNotFoundException("No results found for given style " + styleNumber
                     + "and color" + colorCode + "and size" + sizeCode);
         }
-        return results;
+        return searchResult;
     }
 
     @Override
     public String findProductSizesByStyleAndColor(String styleNumber, String colorCode)
             throws Exception {
         LOG.info("Search for all sizes of product using style numbers and color");
-        String results = "";
-        String searchResult = null;
+        String searchResult = "";
         List<AggregationOperation> list = new ArrayList<AggregationOperation>();
         // Deconstructs an array field from the input documents to output a
         // document for each element
@@ -472,13 +468,11 @@ public class ProductMasterFeedDaoImpl implements ProductMasterFeedDao {
         }
 
         LOG.debug("searchResult : " + searchResult);
-        if (StringUtils.isEmpty(searchResult) == false) {
-            results = searchResult.toString();
-        } else {
+        if (StringUtils.isEmpty(searchResult)) {
             throw new ResourceNotFoundException("No size records found for given style "
                     + styleNumber + "and color" + colorCode);
         }
-        return results;
+        return searchResult.toString();
     }
 
 }

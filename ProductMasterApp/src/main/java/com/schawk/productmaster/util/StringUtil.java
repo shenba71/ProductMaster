@@ -1,6 +1,7 @@
 package com.schawk.productmaster.util;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -56,6 +57,24 @@ public class StringUtil {
         }
 
         return delimiter;
+    }
+
+    /**
+     * Util Method for validating the regex against the field specified and to return the matched string
+     * @param field
+     * @param regexMap
+     * @return
+     */
+    public static String validateFieldWithRegex(final String field,
+            final Map<String, String> regexMap) {
+        String validString = "";
+        for (Map.Entry<String, String> entry : regexMap.entrySet()) {
+            if (field.matches(entry.getValue()) == true) {
+                validString = entry.getKey();
+                break;
+            }
+        }
+        return validString;
     }
 
 }
