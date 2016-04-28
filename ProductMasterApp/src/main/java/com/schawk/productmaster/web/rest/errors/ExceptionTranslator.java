@@ -93,8 +93,7 @@ public class ExceptionTranslator {
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDTO invalidParameterException(InvalidParameterException exception) {
-        String errorMessage = "";
-        return new ErrorDTO(errorMessage);
+        return new ErrorDTO(exception.getMessage());
 
     }
 
