@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.schawk.productmaster.feed.dao.ProductMasterFeedDao;
 import com.schawk.productmaster.feed.service.ProductMasterStagingService;
+import com.schawk.productmaster.web.rest.errors.ResourceNotFoundException;
 
 /**
  * @author shenbagaganesh.param
@@ -137,17 +138,30 @@ public class ProductMasterStagingServiceImpl implements ProductMasterStagingServ
         String response = null;
         String updatedColorData = null;
         int pos = 0;
-        if (productMasterFeedDao.findProductByStyleAndColor(styleNumber, colorNumber)
-                .equalsIgnoreCase("NO RECORDS FOUND FOR GIVEN STYLE AND COLOR")) {
-            valueMap.put("colorCode", colorNumber);
-            updatedColorData = convertMapToJson(valueMap);
-            LOG.debug("Update Request in JSON format.." + updatedColorData);
-            response = productMasterFeedDao.saveColorMetaData(updatedColorData, styleNumber);
-        } else {
+        // updation will happen only if record present for given color.
+        // In try block we are checking whether the given color is already
+        // present. If record present in db, then updation will happen.
+        // If record not present, then the method findProductByStyleAndColor
+        // throws ResourceNotFoundException, In catch block, we suppress this
+        // exception and inserts new color record in DB.
+        try {
+            productMasterFeedDao.findProductByStyleAndColor(styleNumber, colorNumber);
+            LOG.debug("Record exists for given style and color");
             updatedColorData = convertMapToJsonForUpdate(valueMap, type, pos);
             LOG.debug("Update Request in JSON format.." + updatedColorData);
             response = productMasterFeedDao.updateColorMetaData(updatedColorData, styleNumber,
                     colorNumber);
+
+        } catch (ResourceNotFoundException ex) {
+            // the above method for find will throw ResourceNotFoundException if
+            // record not exists.
+            // In our scenario, insertion needs to be done if the record
+            // not present. So we suppress the exception and perform insertion.
+            LOG.debug("Record not exists for given style and color. Creating new record");
+            valueMap.put("colorCode", colorNumber);
+            updatedColorData = convertMapToJson(valueMap);
+            LOG.debug("Update Request in JSON format.." + updatedColorData);
+            response = productMasterFeedDao.saveColorMetaData(updatedColorData, styleNumber);
         }
 
         return response;
@@ -159,20 +173,33 @@ public class ProductMasterStagingServiceImpl implements ProductMasterStagingServ
         String type = "size";
         String response = null;
         String updatedSizeDatas = null;
-        if (("No Product record found for given style, color and size")
-                .equalsIgnoreCase(productMasterFeedDao.findProductByStyleColorAndSize(styleNumber,
-                        colorNumber, sizeCode))) {
-            valueMap.put("sizeCode", sizeCode);
-            updatedSizeDatas = convertMapToJson(valueMap);
-            LOG.debug("Update Request in JSON format.." + updatedSizeDatas);
-            response = productMasterFeedDao.saveSizeMetaData(updatedSizeDatas, styleNumber,
-                    colorNumber);
-        } else {
+        // updation will happen only if record present for given size.
+        // In try block we are checking whether the given size is already
+        // present. If record present in db, then updation will happen.
+        // If record not present, then the method findProductByStyleAndColorAndSize
+        // throws ResourceNotFoundException, In catch block, we suppress this
+        // exception and inserts new size record in DB.
+        try {
+            productMasterFeedDao.findProductByStyleColorAndSize(styleNumber, colorNumber, sizeCode);
+            LOG.debug("Record exists for given style, color and size");
+            //getting index of given size from size array to perform updation
             int pos = productMasterFeedDao.getIndexForSize(styleNumber, colorNumber, sizeCode);
             updatedSizeDatas = convertMapToJsonForUpdate(valueMap, type, pos);
             LOG.debug("Update Request in JSON format.." + updatedSizeDatas);
             response = productMasterFeedDao.updateSizeMetaData(updatedSizeDatas, styleNumber,
                     colorNumber, sizeCode);
+
+        } catch (ResourceNotFoundException ex) {
+            // the above method for find will throw ResourceNotFoundException if
+            // record not exists.
+            // In our scenario, insertion needs to be done if the record
+            // not present. So we suppress the exception and perform insertion.
+            LOG.debug("Record not exists for given style , color and size");
+            valueMap.put("sizeCode", sizeCode);
+            updatedSizeDatas = convertMapToJson(valueMap);
+            LOG.debug("Update Request in JSON format.." + updatedSizeDatas);
+            response = productMasterFeedDao.saveSizeMetaData(updatedSizeDatas, styleNumber,
+                    colorNumber);
         }
 
         return response;
